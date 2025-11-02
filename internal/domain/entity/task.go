@@ -15,7 +15,7 @@ type Task struct {
 	checkerID    checker.ID
 	status       task.Status
 	state        task.State
-	lockDeadline time.Time
+	lockDeadline *time.Time
 	createdAt    time.Time
 	updatedAt    time.Time
 }

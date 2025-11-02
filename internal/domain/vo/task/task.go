@@ -2,7 +2,15 @@ package task
 
 type ID string
 
+func NewID() ID {
+	return ID("") // TODO: uuid
+}
+
 type GroupID string
+
+func NewGroupID() GroupID {
+	return GroupID("") // TODO: uuid
+}
 
 type Status string
 
