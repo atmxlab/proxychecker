@@ -10,6 +10,7 @@ import (
 type App struct {
 	cfg   Config
 	queue *queue.Queue
+	ports Ports
 }
 
 func NewApp(cfg Config) *App {
@@ -19,6 +20,7 @@ func NewApp(cfg Config) *App {
 }
 
 func (a *App) Init() {
+	a.initPorts()
 	a.initQueue()
 }
 

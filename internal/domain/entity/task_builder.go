@@ -53,14 +53,13 @@ func (b *TaskBuilder) UpdatedAt(t time.Time) *TaskBuilder {
 
 func (b *TaskBuilder) Build() *Task {
 	return &Task{
-		id:           b.id,
-		groupID:      b.groupID,
-		proxyID:      b.proxyID,
-		checkerID:    b.checkerID,
-		status:       task.StatusPending,
-		state:        task.State{},
-		lockDeadline: nil,
-		createdAt:    b.createdAt,
-		updatedAt:    b.updatedAt,
+		id:        b.id,
+		groupID:   b.groupID,
+		proxyID:   b.proxyID,
+		checkerID: b.checkerID,
+		status:    task.StatusPending,
+		state:     task.State{},
+		createdAt: b.createdAt,
+		updatedAt: b.updatedAt,
 	}
 }

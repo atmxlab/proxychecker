@@ -5,6 +5,7 @@ import (
 )
 
 type Result struct {
+	ErrorResult   *ErrorResult   `json:"errorResult,omitempty"`
 	LatencyResult *LatencyResult `json:"latencyResult,omitempty"`
 	GEOResult     *GEOResult     `json:"geoResult,omitempty"`
 }
@@ -15,7 +16,11 @@ type LatencyResult struct {
 }
 
 type GEOResult struct {
-	CountryCode string `json:"countryCode"`
-	State       string `json:"state"`
-	City        string `json:"city"`
+	ContinentCode string `json:"continentCode"`
+	Continent     string `json:"continent"`
+	CountryCode   string `json:"countryCode"`
+	Country       string `json:"country"`
+	Region        string `json:"region"`
+	City          string `json:"city"`
+	Timezone      string `json:"timezone"`
 }

@@ -6,52 +6,69 @@ import (
 	"github.com/atmxlab/proxychecker/internal/domain/vo/checker"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/proxy"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
+	"github.com/atmxlab/proxychecker/pkg/errors"
 )
 
 type Task struct {
-	id           task.ID
-	groupID      task.GroupID
-	proxyID      proxy.ID
-	checkerID    checker.ID
-	status       task.Status
-	state        task.State
-	lockDeadline *time.Time
-	createdAt    time.Time
-	updatedAt    time.Time
+	id        task.ID
+	groupID   task.GroupID
+	proxyID   proxy.ID
+	checkerID checker.ID
+	status    task.Status
+	state     task.State
+	createdAt time.Time
+	updatedAt time.Time
 }
 
-func (t Task) GroupID() task.GroupID {
+func (t *Task) GroupID() task.GroupID {
 	return t.groupID
 }
 
-func (t Task) ID() task.ID {
+func (t *Task) ID() task.ID {
 	return t.id
 }
 
-func (t Task) ProxyID() proxy.ID {
+func (t *Task) ProxyID() proxy.ID {
 	return t.proxyID
 }
 
-func (t Task) CheckerID() checker.ID {
+func (t *Task) CheckerID() checker.ID {
 	return t.checkerID
 }
 
-func (t Task) Status() task.Status {
+func (t *Task) Status() task.Status {
 	return t.status
 }
 
-func (t Task) State() task.State {
+func (t *Task) State() task.State {
 	return t.state
 }
 
-func (t Task) LockDeadline() *time.Time {
-	return t.lockDeadline
-}
-
-func (t Task) CreatedAt() time.Time {
+func (t *Task) CreatedAt() time.Time {
 	return t.createdAt
 }
 
-func (t Task) UpdatedAt() time.Time {
+func (t *Task) UpdatedAt() time.Time {
 	return t.updatedAt
+}
+
+func (t *Task) Modify(cb func(m *TaskModifier) error) error {
+	if err := cb(NewTaskModifier(t)); err != nil {
+		return errors.Wrap(err, "callback task modifier")
+	}
+
+	return nil
+}
+
+type TaskModifier struct {
+	t *Task
+}
+
+func NewTaskModifier(t *Task) *TaskModifier {
+	return &TaskModifier{t: t}
+}
+
+func (m *TaskModifier) Success(res task.Result) {
+	m.t.status = task.StatusSuccess
+	m.t.state = m.t.state.SetResult(res)
 }
