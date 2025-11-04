@@ -10,6 +10,7 @@ import (
 	"github.com/atmxlab/proxychecker/internal/domain/vo/checker"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/proxy"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
+	"github.com/atmxlab/proxychecker/internal/port"
 	"github.com/atmxlab/proxychecker/pkg/errors"
 	"github.com/atmxlab/proxychecker/pkg/validator"
 )
@@ -55,14 +56,10 @@ type TxRunner interface {
 	Run(context.Context, func(ctx context.Context) error) error
 }
 
-type Repository interface {
-	InsertProxy(ctx context.Context, proxy ...*entity.Proxy) error
-	InsertTask(ctx context.Context, task ...*entity.Task) error
-}
-
 type CheckCommand struct {
-	repo Repository
-	tx   TxRunner
+	insertProxy port.InsertProxy
+	insertTask  port.InsertTask
+	tx          TxRunner
 }
 
 func (c *CheckCommand) Execute(ctx context.Context, input CheckInput) (*CheckOutput, error) {
@@ -96,12 +93,12 @@ func (c *CheckCommand) Execute(ctx context.Context, input CheckInput) (*CheckOut
 	}
 
 	err := c.tx.Run(ctx, func(ctx context.Context) error {
-		if err := c.repo.InsertProxy(ctx, proxies...); err != nil {
-			return errors.Wrap(err, "c.repo.InsertProxy")
+		if err := c.insertProxy.Execute(ctx, proxies...); err != nil {
+			return errors.Wrap(err, "c.insertProxy.Execute")
 		}
 
-		if err := c.repo.InsertTask(ctx, tasks...); err != nil {
-			return errors.Wrap(err, "c.repo.InsertTask")
+		if err := c.insertTask.Execute(ctx, tasks...); err != nil {
+			return errors.Wrap(err, "c.insertTask.Execute")
 		}
 
 		return nil
