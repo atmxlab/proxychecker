@@ -3,6 +3,9 @@ package queue
 import (
 	"context"
 	"sync"
+
+	"github.com/atmxlab/proxychecker/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type Queue struct {
@@ -33,30 +36,27 @@ func (q *Queue) Add(k Kind, h Handler, opts ...Option) {
 
 func (q *Queue) Run(ctx context.Context) error {
 	for _, h := range q.handlers {
+		logrus.Infof("run queue: kind: [%d], workers count: [%d]", h.kind, h.options.workerCount)
+
 		tasksCh := make(chan Task, q.bufferSize)
 		resultsCh := make(chan result, q.bufferSize)
 
-		for range h.options.workerCount {
-			// Обрабатывает все задачи и кладет результат в канал с результатами.
-			tw := newTasksWorker(tasksCh, resultsCh, h.handler)
-			q.wg.Add(1)
-			go func() {
-				defer q.wg.Done()
-				defer close(resultsCh)
+		logrus.Infof("run tasks workers: kind: [%d], count: [%d]", h.kind, h.options.workerCount)
+		q.wg.Add(1)
+		go func() {
+			defer q.wg.Done()
+			defer close(resultsCh)
+			q.runTasksWorkers(ctx, tasksCh, resultsCh, h)
+		}()
 
-				tw.run(ctx)
-			}()
+		logrus.Infof("run results workers: kind: [%d], count: [%d]", h.kind, h.options.workerCount)
+		q.wg.Add(1)
+		go func() {
+			defer q.wg.Done()
+			q.runResultsWorkers(ctx, resultsCh, h)
+		}()
 
-			// Обрабатывает результат выполнения.
-			rw := newResultsWorker(resultsCh, q.repo)
-			q.wg.Add(1)
-			go func() {
-				defer q.wg.Done()
-
-				rw.run(ctx)
-			}()
-		}
-
+		logrus.Infof("run fetcher: kind: [%d]", h.kind)
 		// Достает таски и кладет в канал.
 		f := newFetcher(tasksCh, q.repo)
 		q.wg.Add(1)
@@ -69,6 +69,44 @@ func (q *Queue) Run(ctx context.Context) error {
 	}
 
 	q.wg.Wait()
+
+	return nil
+}
+
+func (q *Queue) runTasksWorkers(ctx context.Context, tasksCh chan Task, resultsCh chan result, h handler) {
+	wg := sync.WaitGroup{}
+	for range h.options.workerCount {
+		wg.Add(1)
+		// Обрабатывает все задачи и кладет результат в канал с результатами.
+		tw := newTasksWorker(tasksCh, resultsCh, h.handler)
+		go func() {
+			defer wg.Done()
+			tw.run(ctx)
+		}()
+	}
+
+	wg.Wait()
+}
+
+func (q *Queue) runResultsWorkers(ctx context.Context, resultsCh chan result, h handler) {
+	wg := sync.WaitGroup{}
+	for range h.options.workerCount {
+		wg.Add(1)
+		// Обрабатывает результат выполнения.
+		rw := newResultsWorker(resultsCh, q.repo)
+		go func() {
+			defer wg.Done()
+			rw.run(ctx)
+		}()
+	}
+
+	wg.Wait()
+}
+
+func (q *Queue) PushTasks(ctx context.Context, task ...Task) error {
+	if err := q.repo.PushTasks(ctx, task...); err != nil {
+		return errors.Wrap(err, "q.repo.PushTasks")
+	}
 
 	return nil
 }

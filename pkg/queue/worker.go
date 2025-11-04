@@ -2,9 +2,9 @@ package queue
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/atmxlab/proxychecker/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type tasksWorker struct {
@@ -45,7 +45,7 @@ func (w *resultsWorker) run(ctx context.Context) {
 		}
 
 		if err := w.repo.UpdateTask(ctx, res.task); err != nil {
-			slog.Error("w.repo.UpdateTask: err: [%s]", err)
+			logrus.Errorf("w.repo.UpdateTask: err: [%s]", err)
 		}
 	}
 }

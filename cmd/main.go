@@ -8,6 +8,7 @@ import (
 
 	"github.com/atmxlab/atmc"
 	"github.com/atmxlab/proxychecker/cmd/app"
+	_ "github.com/atmxlab/proxychecker/pkg/logger"
 )
 
 func main() {

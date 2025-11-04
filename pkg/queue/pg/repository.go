@@ -9,7 +9,7 @@ import (
 type Repository struct {
 }
 
-func NewRepository() *Repository {
+func New() *Repository {
 	return &Repository{}
 }
 
@@ -19,6 +19,11 @@ func (r Repository) UpdateTask(ctx context.Context, task queue.Task) error {
 }
 
 func (r Repository) AcquireTasks(ctx context.Context, kind queue.Kind) ([]queue.Task, error) {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (r Repository) PushTasks(ctx context.Context, task ...queue.Task) error {
 	// TODO implement me
 	panic("implement me")
 }

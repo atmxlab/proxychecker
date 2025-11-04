@@ -2,10 +2,10 @@ package queue
 
 import (
 	"context"
-	"log/slog"
 	"time"
 
 	"github.com/atmxlab/proxychecker/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type fetcher struct {
@@ -24,14 +24,19 @@ func (f *fetcher) run(ctx context.Context, kind Kind) {
 	for {
 		select {
 		case <-ctx.Done():
-			slog.Info("context done: kind: [%d]", kind)
+			logrus.Infof("context done: kind: [%d]", kind)
 			return
 		default:
 			tasks, err := f.fetch(ctx, kind)
-			if err != nil {
-				slog.Error("fetcher.fetch: err: [%s]", err)
-				time.Sleep(5 * time.Second)
-			} else {
+			switch {
+			case err != nil:
+				logrus.Errorf("fetcher.fetch: kind: [%d], err: [%s]", kind, err)
+				time.Sleep(5 * time.Second) // TODO: cfg
+			case len(tasks) == 0:
+				logrus.Infof("fetcher.fetch: kind: [%d], no tasks", kind)
+				time.Sleep(1 * time.Second) // TODO: cfg
+			default:
+				logrus.Infof("fetcher.fetch: kind: [%d], len: [%d]", kind, len(tasks))
 				for _, t := range tasks {
 					f.tasksCh <- t
 				}
