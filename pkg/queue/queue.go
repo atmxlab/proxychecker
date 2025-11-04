@@ -2,22 +2,23 @@ package queue
 
 import (
 	"context"
-	"log/slog"
 	"sync"
-	"time"
 )
 
 type Queue struct {
 	handlers   []handler
-	fetcher    *fetcher
+	repo       Repository
 	bufferSize int
 	wg         sync.WaitGroup
 }
 
-func NewQueue(bufferSize int) *Queue {
+func NewQueue(
+	repo Repository,
+	bufferSize int,
+) *Queue {
 	return &Queue{
+		repo:       repo,
 		bufferSize: bufferSize,
-		fetcher:    newFetcher(),
 	}
 }
 
@@ -32,43 +33,38 @@ func (q *Queue) Add(k Kind, h Handler, opts ...Option) {
 
 func (q *Queue) Run(ctx context.Context) error {
 	for _, h := range q.handlers {
-		tasksCh := make(chan Task)
-		resultsCh := make(chan result)
+		tasksCh := make(chan Task, q.bufferSize)
+		resultsCh := make(chan result, q.bufferSize)
 
 		for range h.options.workerCount {
-			w := newWorker(tasksCh, resultsCh, h.handler)
+			// Обрабатывает все задачи и кладет результат в канал с результатами.
+			tw := newTasksWorker(tasksCh, resultsCh, h.handler)
 			q.wg.Add(1)
 			go func() {
 				defer q.wg.Done()
 				defer close(resultsCh)
 
-				w.run(ctx)
+				tw.run(ctx)
+			}()
+
+			// Обрабатывает результат выполнения.
+			rw := newResultsWorker(resultsCh, q.repo)
+			q.wg.Add(1)
+			go func() {
+				defer q.wg.Done()
+
+				rw.run(ctx)
 			}()
 		}
 
+		// Достает таски и кладет в канал.
+		f := newFetcher(tasksCh, q.repo)
 		q.wg.Add(1)
-		// Запускается обработка для одного вида задачи.
 		go func() {
 			defer q.wg.Done()
 			defer close(tasksCh)
 
-			for {
-				select {
-				case <-ctx.Done():
-					slog.Info("context done: kind: [%d]", h.kind)
-					return
-				default:
-					tasks, err := q.fetcher.fetch(ctx, h.kind)
-					if err != nil {
-						slog.Error("fetcher.fetch: err: [%s]", err.Error())
-						time.Sleep(5 * time.Second)
-					} else {
-						for _, t := range tasks {
-							tasksCh <- t
-						}
-					}
-				}
-			}
+			f.run(ctx, h.kind)
 		}()
 	}
 

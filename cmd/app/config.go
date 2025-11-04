@@ -1,10 +1,10 @@
 package app
 
 type Config struct {
-	queue Queue
+	Queue Queue `atmc:"queue"`
 }
 
 type Queue struct {
-	QueueWorkerCount int16
-	QueueBufferSize  int16
+	QueueWorkerCount uint `atmc:"queueWorkerCount"`
+	QueueBufferSize  int  `atmc:"queueBufferSize"`
 }

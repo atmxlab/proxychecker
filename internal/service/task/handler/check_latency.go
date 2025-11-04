@@ -13,4 +13,5 @@ func NewCheckLatencyHandler() *CheckLatencyHandler {
 }
 
 func (c CheckLatencyHandler) Handle(ctx context.Context, task queue.Task) error {
+	return nil
 }
