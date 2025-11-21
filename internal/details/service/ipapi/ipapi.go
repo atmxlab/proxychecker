@@ -43,7 +43,7 @@ func New(client client.Client) *Service {
 }
 
 func (s *Service) Get(ctx context.Context) (Output, error) {
-	bytes, err := s.client.Get(ctx, "http://ip-api.com")
+	bytes, err := s.client.Get(ctx, "http://ip-api.com/json")
 	if err != nil {
 		return Output{}, errors.Wrap(err, "s.client.Get")
 	}

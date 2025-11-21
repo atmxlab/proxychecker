@@ -37,6 +37,7 @@ func (f *fetcher) run(ctx context.Context, kind Kind) {
 				time.Sleep(1 * time.Second) // TODO: cfg
 			default:
 				logrus.Infof("fetcher.fetch: kind: [%d], len: [%d]", kind, len(tasks))
+				time.Sleep(2 * time.Second) // TODO: cfg
 				for _, t := range tasks {
 					f.tasksCh <- t
 				}

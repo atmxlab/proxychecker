@@ -13,6 +13,7 @@ type TaskBuilder struct {
 	groupID   task.GroupID
 	proxyID   proxy.ID
 	checkerID checker.ID
+	payload   task.Payload
 	createdAt time.Time
 	updatedAt time.Time
 }
@@ -48,6 +49,11 @@ func (b *TaskBuilder) CreatedAt(t time.Time) *TaskBuilder {
 
 func (b *TaskBuilder) UpdatedAt(t time.Time) *TaskBuilder {
 	b.updatedAt = t
+	return b
+}
+
+func (b *TaskBuilder) TargetURL(targetURL task.TargetURL) *TaskBuilder {
+	b.payload.TargetURL = &targetURL
 	return b
 }
 

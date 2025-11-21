@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/atmxlab/proxychecker/internal/domain/entity"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
@@ -13,7 +12,7 @@ import (
 )
 
 type Checker interface {
-	Run(ctx context.Context, p *entity.Proxy) (task.Result, error)
+	Run(ctx context.Context, t *entity.Task, p *entity.Proxy) (task.Result, error)
 }
 
 type BaseCheckHandler struct {
@@ -38,9 +37,9 @@ func NewBaseCheckHandler(
 }
 
 func (c *BaseCheckHandler) Handle(ctx context.Context, qt queue.Task) error {
-	var p payload.Task
-	if err := json.Unmarshal(qt.Payload(), &p); err != nil {
-		return errors.Wrap(err, "json.Unmarshal")
+	p, err := payload.NewTaskFromBytes(qt.Payload())
+	if err != nil {
+		return errors.Wrap(err, "payload.NewTaskFromBytes")
 	}
 
 	t, err := c.getTask.Execute(ctx, p.ID)
@@ -53,7 +52,7 @@ func (c *BaseCheckHandler) Handle(ctx context.Context, qt queue.Task) error {
 		return errors.Wrap(err, "getProxy.Execute")
 	}
 
-	res, err := c.checker.Run(ctx, px)
+	res, err := c.checker.Run(ctx, t, px)
 	if err != nil {
 		return errors.Wrap(err, "checker.Run")
 	}

@@ -9,12 +9,11 @@ const (
 )
 
 func (t Kind) String() string {
-	switch t {
-	case KindCheckLatency:
-		return "TaskCheckLatency"
-	case KindCheckGEO:
-		return "TaskCheckGEO"
-	default:
-		return "TaskUnknown"
+	m := map[Kind]string{
+		KindUnknown:      "Unknown",
+		KindCheckLatency: "CheckLatency",
+		KindCheckGEO:     "CheckGEO",
 	}
+
+	return m[t]
 }

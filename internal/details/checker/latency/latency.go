@@ -14,7 +14,7 @@ func New() *Checker {
 	return &Checker{}
 }
 
-func (c Checker) Run(ctx context.Context, p *entity.Proxy) (task.Result, error) {
+func (c Checker) Run(ctx context.Context, t *entity.Task, p *entity.Proxy) (task.Result, error) {
 	// TODO implement me
 	panic("implement me")
 }

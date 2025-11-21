@@ -44,6 +44,8 @@ func (w *resultsWorker) run(ctx context.Context) {
 			res.task.status = StatusPending
 		}
 
+		logrus.Infof("result: task_id: [%s], status: [%s], err: [%v]", res.task.id, res.task.status, res.err)
+
 		if err := w.repo.UpdateTask(ctx, res.task); err != nil {
 			logrus.Errorf("w.repo.UpdateTask: err: [%s]", err)
 		}

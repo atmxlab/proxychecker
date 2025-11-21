@@ -1,15 +1,25 @@
 package task
 
+import "github.com/atmxlab/proxychecker/pkg/uuid"
+
 type ID string
 
 func NewID() ID {
-	return ID("") // TODO: uuid
+	return ID(uuid.MustV7().String())
+}
+
+func (id ID) String() string {
+	return string(id)
 }
 
 type GroupID string
 
 func NewGroupID() GroupID {
-	return GroupID("") // TODO: uuid
+	return GroupID(uuid.MustV7().String())
+}
+
+func (id GroupID) String() string {
+	return string(id)
 }
 
 type Status string

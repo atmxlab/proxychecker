@@ -27,7 +27,7 @@ func New(clientFactory client.Factory, ipApiFactory IPApiFactory) *Checker {
 	return &Checker{clientFactory: clientFactory, ipApiFactory: ipApiFactory}
 }
 
-func (c *Checker) Run(ctx context.Context, p *entity.Proxy) (task.Result, error) {
+func (c *Checker) Run(ctx context.Context, _ *entity.Task, p *entity.Proxy) (task.Result, error) {
 	cl := c.clientFactory.Create(p)
 	ipApi := c.ipApiFactory.Create(cl)
 

@@ -23,8 +23,17 @@ func (i *InMemory) UpdateTask(ctx context.Context, task queue.Task) error {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
-	if t, ok := i.tasks[task.ID()]; ok {
-		i.tasks[task.ID()] = t
+	if err := i.updateTask(ctx, task); err != nil {
+		return errors.Wrap(err, "i.updateTask")
+	}
+
+	return nil
+}
+
+func (i *InMemory) updateTask(ctx context.Context, task queue.Task) error {
+	if _, ok := i.tasks[task.ID()]; ok {
+		i.tasks[task.ID()] = task
+		return nil
 	}
 
 	return errors.Newf("task not found: id: [%s]", task.ID())
@@ -38,6 +47,10 @@ func (i *InMemory) AcquireTasks(ctx context.Context, kind queue.Kind) ([]queue.T
 	for _, t := range i.tasks {
 		if t.Kind() == kind && t.Status() == queue.StatusPending {
 			acquired = append(acquired, t)
+
+			if err := i.updateTask(ctx, t.SetStatus(queue.StatusRunning)); err != nil {
+				return nil, errors.Wrap(err, "i.updateTask")
+			}
 		}
 	}
 

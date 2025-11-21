@@ -15,6 +15,7 @@ type Task struct {
 	proxyID   proxy.ID
 	checkerID checker.ID
 	status    task.Status
+	payload   task.Payload
 	state     task.State
 	createdAt time.Time
 	updatedAt time.Time
@@ -42,6 +43,14 @@ func (t *Task) Status() task.Status {
 
 func (t *Task) State() task.State {
 	return t.state
+}
+
+func (t *Task) TargetURL() (task.TargetURL, bool) {
+	if t.payload.TargetURL != nil {
+		return *t.payload.TargetURL, true
+	}
+
+	return task.TargetURL{}, false
 }
 
 func (t *Task) CreatedAt() time.Time {

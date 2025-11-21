@@ -1,6 +1,10 @@
 package queue
 
-import "time"
+import (
+	"time"
+
+	"github.com/atmxlab/proxychecker/pkg/uuid"
+)
 
 type Status int
 
@@ -12,9 +16,29 @@ const (
 	StatusFailure
 )
 
+func (s Status) String() string {
+	m := map[Status]string{
+		StatusUnknown: "unknown",
+		StatusPending: "pending",
+		StatusRunning: "running",
+		StatusSuccess: "success",
+		StatusFailure: "failure",
+	}
+
+	return m[s]
+}
+
 type Kind int16
 
 type ID string
+
+func NewID() ID {
+	return ID(uuid.MustV7().String())
+}
+
+func (id ID) String() string {
+	return string(id)
+}
 
 type Task struct {
 	id         ID
@@ -52,4 +76,9 @@ func (t Task) CreatedAt() time.Time {
 
 func (t Task) UpdatedAt() time.Time {
 	return t.updatedAt
+}
+
+func (t Task) SetStatus(status Status) Task {
+	t.status = status // TODO: refactor: use modifier
+	return t
 }

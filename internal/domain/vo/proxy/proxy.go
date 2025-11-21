@@ -1,11 +1,19 @@
 package proxy
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/atmxlab/proxychecker/pkg/uuid"
+)
 
 type ID string
 
 func NewID() ID {
-	return ID("") // TODO: uuid
+	return ID(uuid.MustV7().String())
+}
+
+func (id ID) String() string {
+	return string(id)
 }
 
 type Protocol string
