@@ -28,7 +28,7 @@ func (s Status) String() string {
 	return m[s]
 }
 
-type Kind int16
+type Kind string
 
 type ID string
 

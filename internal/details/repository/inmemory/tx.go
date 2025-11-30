@@ -7,6 +7,6 @@ import (
 type TxRunner struct {
 }
 
-func (t TxRunner) Run(ctx context.Context, f func(ctx context.Context) error) error {
+func (t TxRunner) Execute(ctx context.Context, f func(ctx context.Context) error) error {
 	return f(ctx)
 }

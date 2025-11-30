@@ -1,19 +1,34 @@
 package task
 
-type Kind int16
+import (
+	"github.com/atmxlab/proxychecker/internal/domain/vo/checker"
+	"github.com/atmxlab/proxychecker/pkg/queue"
+)
+
+type Kind string
 
 const (
-	KindUnknown Kind = iota
-	KindCheckLatency
-	KindCheckGEO
+	KindUnknown         Kind = "Unknown"
+	KindCheckLatency    Kind = "CheckLatency"
+	KindCheckGEO        Kind = "CheckGEO"
+	KindCheckExternalIP Kind = "CheckExternalIP"
 )
 
 func (t Kind) String() string {
-	m := map[Kind]string{
-		KindUnknown:      "Unknown",
-		KindCheckLatency: "CheckLatency",
-		KindCheckGEO:     "CheckGEO",
+	return string(t)
+}
+
+func (t Kind) ToQueue() queue.Kind {
+	return queue.Kind(t)
+}
+
+func FromDomainTask(kind checker.Kind) Kind {
+	m := map[checker.Kind]Kind{
+		checker.KindUnknown:    KindUnknown,
+		checker.KindLatency:    KindCheckLatency,
+		checker.KindGEO:        KindCheckGEO,
+		checker.KindExternalIP: KindCheckExternalIP,
 	}
 
-	return m[t]
+	return m[kind]
 }

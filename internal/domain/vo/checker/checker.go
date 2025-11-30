@@ -1,12 +1,10 @@
 package checker
 
-type ID string
-
 type Kind string
 
 const (
-	KindUnknown    Kind = "unknown"
-	KindLatency    Kind = "latency"
-	KindGEO        Kind = "geo"
-	KindExternalIP Kind = "external_ip"
+	KindUnknown    Kind = "Unknown"
+	KindLatency    Kind = "Latency"
+	KindGEO        Kind = "GEO"
+	KindExternalIP Kind = "ExternalIP"
 )

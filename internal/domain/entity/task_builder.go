@@ -9,13 +9,13 @@ import (
 )
 
 type TaskBuilder struct {
-	id        task.ID
-	groupID   task.GroupID
-	proxyID   proxy.ID
-	checkerID checker.ID
-	payload   task.Payload
-	createdAt time.Time
-	updatedAt time.Time
+	id          task.ID
+	groupID     task.GroupID
+	proxyID     proxy.ID
+	checkerKind checker.Kind
+	payload     task.Payload
+	createdAt   time.Time
+	updatedAt   time.Time
 }
 
 func NewTaskBuilder() *TaskBuilder {
@@ -37,8 +37,8 @@ func (b *TaskBuilder) ProxyID(id proxy.ID) *TaskBuilder {
 	return b
 }
 
-func (b *TaskBuilder) CheckerID(id checker.ID) *TaskBuilder {
-	b.checkerID = id
+func (b *TaskBuilder) CheckerKind(kind checker.Kind) *TaskBuilder {
+	b.checkerKind = kind
 	return b
 }
 
@@ -59,13 +59,13 @@ func (b *TaskBuilder) TargetURL(targetURL task.TargetURL) *TaskBuilder {
 
 func (b *TaskBuilder) Build() *Task {
 	return &Task{
-		id:        b.id,
-		groupID:   b.groupID,
-		proxyID:   b.proxyID,
-		checkerID: b.checkerID,
-		status:    task.StatusPending,
-		state:     task.State{},
-		createdAt: b.createdAt,
-		updatedAt: b.updatedAt,
+		id:          b.id,
+		groupID:     b.groupID,
+		proxyID:     b.proxyID,
+		checkerKind: b.checkerKind,
+		status:      task.StatusPending,
+		state:       task.State{},
+		createdAt:   b.createdAt,
+		updatedAt:   b.updatedAt,
 	}
 }

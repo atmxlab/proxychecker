@@ -54,7 +54,7 @@ func (c *BaseCheckHandler) Handle(ctx context.Context, qt queue.Task) error {
 
 	res, err := c.checker.Run(ctx, t, px)
 	if err != nil {
-		return errors.Wrap(err, "checker.Run")
+		return errors.Wrap(err, "checker.Execute")
 	}
 
 	err = t.Modify(func(m *entity.TaskModifier) error {

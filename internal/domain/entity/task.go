@@ -10,15 +10,15 @@ import (
 )
 
 type Task struct {
-	id        task.ID
-	groupID   task.GroupID
-	proxyID   proxy.ID
-	checkerID checker.ID
-	status    task.Status
-	payload   task.Payload
-	state     task.State
-	createdAt time.Time
-	updatedAt time.Time
+	id          task.ID
+	groupID     task.GroupID
+	proxyID     proxy.ID
+	checkerKind checker.Kind
+	status      task.Status
+	payload     task.Payload
+	state       task.State
+	createdAt   time.Time
+	updatedAt   time.Time
 }
 
 func (t *Task) GroupID() task.GroupID {
@@ -33,8 +33,8 @@ func (t *Task) ProxyID() proxy.ID {
 	return t.proxyID
 }
 
-func (t *Task) CheckerID() checker.ID {
-	return t.checkerID
+func (t *Task) CheckerKind() checker.Kind {
+	return t.checkerKind
 }
 
 func (t *Task) Status() task.Status {
