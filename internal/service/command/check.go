@@ -14,30 +14,29 @@ import (
 	stask "github.com/atmxlab/proxychecker/internal/service/task"
 	"github.com/atmxlab/proxychecker/internal/service/task/payload"
 	"github.com/atmxlab/proxychecker/pkg/errors"
-	"github.com/atmxlab/proxychecker/pkg/queue"
 	"github.com/atmxlab/proxychecker/pkg/validator"
 )
 
 type CheckInput struct {
-	operationTime time.Time
-	proxies       []string
-	checkerKinds  []checker.Kind
+	OperationTime time.Time
+	Proxies       []string
+	Checkers      []checker.Kind
 }
 
 func (i CheckInput) Validate() error {
 	v := validator.New()
 
-	if len(i.proxies) == 0 {
+	if len(i.Proxies) == 0 {
 		v.Failed("empty proxies")
 	}
-	if len(i.checkerKinds) == 0 {
+	if len(i.Checkers) == 0 {
 		v.Failed("empty checkers")
 	}
-	if i.operationTime.IsZero() || i.operationTime.Unix() <= 0 {
+	if i.OperationTime.IsZero() || i.OperationTime.Unix() <= 0 {
 		v.Failed("invalid operation time")
 	}
 
-	for _, pUrl := range i.proxies {
+	for _, pUrl := range i.Proxies {
 		u, err := url.Parse(pUrl)
 		if err != nil {
 			v.AddErr(errors.Wrapf(err, "invalid proxy URL: %s", pUrl))
@@ -62,17 +61,32 @@ type CheckCommand struct {
 	scheduleTask port.ScheduleTask
 }
 
+func NewCheckCommand(
+	runTx port.RunTx,
+	insertProxy port.InsertProxy,
+	insertTask port.InsertTask,
+	scheduleTask port.ScheduleTask,
+) *CheckCommand {
+	return &CheckCommand{
+		runTx:        runTx,
+		insertProxy:  insertProxy,
+		insertTask:   insertTask,
+		scheduleTask: scheduleTask,
+	}
+}
+
 func (c *CheckCommand) Execute(ctx context.Context, input CheckInput) (*CheckOutput, error) {
 	if err := input.Validate(); err != nil {
 		return nil, errors.Wrap(err, "invalid input")
 	}
 
-	proxies, err := c.makeProxies(input.proxies, input.operationTime)
+	proxies, err := c.makeProxies(input.Proxies, input.OperationTime)
 	if err != nil {
 		return nil, errors.Wrap(err, "c.makeProxies")
 	}
 
-	tasks, groupID := c.makeTasks(proxies, input.checkerKinds, input.operationTime)
+	tasks, groupID := c.makeTasks(proxies, input.Checkers, input.OperationTime)
+
 	qTasks, err := c.makeQueueTasks(tasks)
 	if err != nil {
 		return nil, errors.Wrap(err, "c.makeQueueTasks")
@@ -140,18 +154,16 @@ func (c *CheckCommand) makeTasks(
 }
 
 func (c *CheckCommand) makeQueueTasks(tasks []*entity.Task) (
-	[]queue.Task,
+	[]stask.Task,
 	error,
 ) {
-	qTasks := make([]queue.Task, 0, len(tasks))
+	qTasks := make([]stask.Task, 0, len(tasks))
 
 	for _, tk := range tasks {
-		qtk, err := c.buildQueueTask(tk)
-		if err != nil {
-			return nil, errors.Wrapf(err, "c.buildQueueTask")
-		}
-
-		qTasks = append(qTasks, qtk)
+		qTasks = append(qTasks, &payload.Task{
+			ID:          tk.ID(),
+			CheckerKind: tk.CheckerKind(),
+		})
 	}
 
 	return qTasks, nil
@@ -187,25 +199,4 @@ func (c *CheckCommand) buildTask(
 		Build()
 
 	return t
-}
-
-func (c *CheckCommand) buildQueueTask(tk *entity.Task) (queue.Task, error) {
-	p := payload.Task{
-		ID: tk.ID(),
-	}
-	bytes, err := p.Marshal()
-	if err != nil {
-		return queue.Task{}, errors.Wrap(err, "payload.Marshal")
-	}
-
-	qTask := queue.
-		NewTaskBuilder().
-		Kind(stask.FromDomainTask(tk.CheckerKind()).ToQueue()).
-		ID(queue.NewID()).
-		CreatedAt(time.Now()).
-		Status(queue.StatusPending).
-		Payload(bytes).
-		Build()
-
-	return qTask, nil
 }

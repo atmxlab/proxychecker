@@ -2,11 +2,15 @@ package port
 
 import (
 	"context"
-	"time"
 
 	"github.com/atmxlab/proxychecker/internal/domain/aggregate"
+	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
 )
 
-type AcquireTasks interface {
-	Execute(ctx context.Context, deadline time.Time) ([]*aggregate.Task, error)
+type GetTaskAgg interface {
+	Execute(ctx context.Context, id task.ID) (*aggregate.Task, error)
+}
+
+type SaveTaskAgg interface {
+	Execute(ctx context.Context, agg *aggregate.Task) error
 }

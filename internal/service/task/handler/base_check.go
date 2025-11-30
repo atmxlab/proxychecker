@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/atmxlab/proxychecker/internal/domain/entity"
+	"github.com/atmxlab/proxychecker/internal/domain/aggregate"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
 	"github.com/atmxlab/proxychecker/internal/port"
 	"github.com/atmxlab/proxychecker/internal/service/task/payload"
@@ -12,27 +12,24 @@ import (
 )
 
 type Checker interface {
-	Run(ctx context.Context, t *entity.Task, p *entity.Proxy) (task.Result, error)
+	Run(ctx context.Context, t *aggregate.Task) (task.Result, error)
 }
 
 type BaseCheckHandler struct {
-	checker    Checker
-	getProxy   port.GetProxy
-	getTask    port.GetTask
-	updateTask port.UpdateTask
+	checker     Checker
+	getTaskAgg  port.GetTaskAgg
+	saveTaskAgg port.SaveTaskAgg
 }
 
 func NewBaseCheckHandler(
 	checker Checker,
-	getProxy port.GetProxy,
-	getTask port.GetTask,
-	updateTask port.UpdateTask,
+	getTaskAgg port.GetTaskAgg,
+	saveTaskAgg port.SaveTaskAgg,
 ) *BaseCheckHandler {
 	return &BaseCheckHandler{
-		checker:    checker,
-		getProxy:   getProxy,
-		getTask:    getTask,
-		updateTask: updateTask,
+		checker:     checker,
+		getTaskAgg:  getTaskAgg,
+		saveTaskAgg: saveTaskAgg,
 	}
 }
 
@@ -42,31 +39,22 @@ func (c *BaseCheckHandler) Handle(ctx context.Context, qt queue.Task) error {
 		return errors.Wrap(err, "payload.NewTaskFromBytes")
 	}
 
-	t, err := c.getTask.Execute(ctx, p.ID)
+	t, err := c.getTaskAgg.Execute(ctx, p.ID)
 	if err != nil {
-		return errors.Wrap(err, "getTask.Execute")
+		return errors.Wrap(err, "getTaskAgg.Execute")
 	}
 
-	px, err := c.getProxy.Execute(ctx, t.ProxyID())
+	res, err := c.checker.Run(ctx, t)
 	if err != nil {
-		return errors.Wrap(err, "getProxy.Execute")
+		return errors.Wrap(err, "checker.Run")
 	}
 
-	res, err := c.checker.Run(ctx, t, px)
-	if err != nil {
-		return errors.Wrap(err, "checker.Execute")
+	if err = t.Success(res); err != nil {
+		return errors.Wrap(err, "taskAgg.Success")
 	}
 
-	err = t.Modify(func(m *entity.TaskModifier) error {
-		m.Success(res)
-		return nil
-	})
-	if err != nil {
-		return errors.Wrap(err, "t.Modify")
-	}
-
-	if err = c.updateTask.Execute(ctx, t); err != nil {
-		return errors.Wrap(err, "updateTask.Execute")
+	if err = c.saveTaskAgg.Execute(ctx, t); err != nil {
+		return errors.Wrap(err, "saveTaskAgg.Execute")
 	}
 
 	return nil

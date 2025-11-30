@@ -4,9 +4,13 @@ import (
 	"context"
 )
 
-type TxRunner struct {
+type RunTx struct {
 }
 
-func (t TxRunner) Execute(ctx context.Context, f func(ctx context.Context) error) error {
+func NewRunTx() *RunTx {
+	return &RunTx{}
+}
+
+func (t RunTx) Execute(ctx context.Context, f func(ctx context.Context) error) error {
 	return f(ctx)
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/atmxlab/proxychecker/internal/details/client"
 	"github.com/atmxlab/proxychecker/internal/details/service/ipapi"
-	"github.com/atmxlab/proxychecker/internal/domain/entity"
+	"github.com/atmxlab/proxychecker/internal/domain/aggregate"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
 	"github.com/atmxlab/proxychecker/pkg/errors"
 )
@@ -27,8 +27,8 @@ func New(clientFactory client.Factory, ipApiFactory IPApiFactory) *Checker {
 	return &Checker{clientFactory: clientFactory, ipApiFactory: ipApiFactory}
 }
 
-func (c *Checker) Run(ctx context.Context, _ *entity.Task, p *entity.Proxy) (task.Result, error) {
-	cl := c.clientFactory.Create(p)
+func (c *Checker) Run(ctx context.Context, agg *aggregate.Task) (task.Result, error) {
+	cl := c.clientFactory.Create(agg.Proxy())
 	ipApi := c.ipApiFactory.Create(cl)
 
 	output, err := ipApi.Get(ctx)

@@ -5,6 +5,13 @@ import (
 	"github.com/atmxlab/proxychecker/pkg/queue"
 )
 
+type Task interface {
+	Kind() Kind
+	Key() string
+	Unmarshal([]byte) error
+	Marshal() ([]byte, error)
+	Validate() error
+}
 type Kind string
 
 const (
