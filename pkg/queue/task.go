@@ -28,6 +28,10 @@ func (s Status) String() string {
 	return m[s]
 }
 
+func NonTerminateStatus() []Status {
+	return []Status{StatusPending, StatusRunning}
+}
+
 type Kind string
 
 type ID string

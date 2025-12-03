@@ -12,7 +12,9 @@ import (
 
 func (a *App) initQueue() {
 	a.queue = queue.NewQueue(inmemory.New(), a.cfg.Queue.QueueBufferSize)
+}
 
+func (a *App) initQueueHandlers() {
 	addHandler := func(kind stask.Kind, checker handler.Checker) {
 		a.queue.Add(
 			queue.Kind(kind),

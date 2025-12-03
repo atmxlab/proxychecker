@@ -18,3 +18,11 @@ type UpdateTask interface {
 type GetTask interface {
 	Execute(ctx context.Context, id task.ID) (*entity.Task, error)
 }
+
+type GetTasks interface {
+	Execute(ctx context.Context) ([]*entity.Task, error)
+}
+
+type GetTasksByGroupID interface {
+	Execute(ctx context.Context, groupID task.GroupID) ([]*entity.Task, error)
+}

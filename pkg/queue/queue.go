@@ -110,3 +110,12 @@ func (q *Queue) PushTasks(ctx context.Context, task ...Task) error {
 
 	return nil
 }
+
+func (q *Queue) GetNonTerminatedTasks(ctx context.Context) ([]Task, error) {
+	tasks, err := q.repo.GetNonTerminatedTasks(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "q.repo.GetNonTerminatedTasks")
+	}
+
+	return tasks, nil
+}

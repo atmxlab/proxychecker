@@ -51,7 +51,7 @@ func (i CheckInput) Validate() error {
 }
 
 type CheckOutput struct {
-	taskGroupID task.GroupID
+	TaskGroupID task.GroupID
 }
 
 type CheckCommand struct {
@@ -111,7 +111,7 @@ func (c *CheckCommand) Execute(ctx context.Context, input CheckInput) (*CheckOut
 		return nil, errors.Wrap(err, "c.repo.InsertProxy")
 	}
 
-	return &CheckOutput{taskGroupID: groupID}, nil
+	return &CheckOutput{TaskGroupID: groupID}, nil
 }
 
 func (c *CheckCommand) makeProxies(proxyUrls []string, ot time.Time) ([]*entity.Proxy, error) {

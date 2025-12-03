@@ -8,6 +8,7 @@ import (
 	"github.com/atmxlab/proxychecker/internal/domain/vo/proxy"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
 	"github.com/atmxlab/proxychecker/pkg/errors"
+	"github.com/samber/lo"
 )
 
 type ProxySharedState struct {
@@ -38,6 +39,21 @@ func (r *InsertProxy) Execute(ctx context.Context, proxy ...*entity.Proxy) error
 	}
 
 	return nil
+}
+
+type GetProxies struct {
+	state *ProxySharedState
+}
+
+func NewGetProxies(state *ProxySharedState) *GetProxies {
+	return &GetProxies{state: state}
+}
+
+func (r *GetProxies) Execute(ctx context.Context) ([]*entity.Proxy, error) {
+	r.state.mu.Lock()
+	defer r.state.mu.Unlock()
+
+	return lo.Values(r.state.proxies), nil
 }
 
 type GetProxy struct {
@@ -123,4 +139,41 @@ func (r *GetTask) Execute(ctx context.Context, id task.ID) (*entity.Task, error)
 	}
 
 	return nil, errors.NotFoundf("task not found: id: [%s]", id)
+}
+
+type GetTasks struct {
+	state *TaskSharedState
+}
+
+func NewGetTasks(state *TaskSharedState) *GetTasks {
+	return &GetTasks{state: state}
+}
+
+func (r *GetTasks) Execute(ctx context.Context) ([]*entity.Task, error) {
+	r.state.mu.Lock()
+	defer r.state.mu.Unlock()
+
+	return lo.Values(r.state.tasks), nil
+}
+
+type GetTasksByGroupID struct {
+	state *TaskSharedState
+}
+
+func NewGetTasksByGroupID(state *TaskSharedState) *GetTasksByGroupID {
+	return &GetTasksByGroupID{state: state}
+}
+
+func (r *GetTasksByGroupID) Execute(ctx context.Context, groupID task.GroupID) ([]*entity.Task, error) {
+	r.state.mu.Lock()
+	defer r.state.mu.Unlock()
+
+	tasks := make([]*entity.Task, 0)
+	for _, t := range r.state.tasks {
+		if t.GroupID() == groupID {
+			tasks = append(tasks, t)
+		}
+	}
+
+	return tasks, nil
 }

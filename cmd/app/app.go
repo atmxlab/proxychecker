@@ -47,6 +47,7 @@ func (a *App) Init() {
 	a.initQueue()
 	a.initPorts()
 	a.initCommands()
+	a.initQueueHandlers()
 }
 
 func (a *App) Start(ctx context.Context) error {

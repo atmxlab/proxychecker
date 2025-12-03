@@ -14,3 +14,7 @@ type InsertProxy interface {
 type GetProxy interface {
 	Execute(ctx context.Context, id proxy.ID) (*entity.Proxy, error)
 }
+
+type GetProxies interface {
+	Execute(ctx context.Context) ([]*entity.Proxy, error)
+}

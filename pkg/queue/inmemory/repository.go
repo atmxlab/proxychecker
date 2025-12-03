@@ -6,6 +6,7 @@ import (
 
 	"github.com/atmxlab/proxychecker/pkg/errors"
 	"github.com/atmxlab/proxychecker/pkg/queue"
+	"github.com/samber/lo"
 )
 
 type InMemory struct {
@@ -66,4 +67,18 @@ func (i *InMemory) PushTasks(ctx context.Context, task ...queue.Task) error {
 	}
 
 	return nil
+}
+
+func (i *InMemory) GetNonTerminatedTasks(ctx context.Context) ([]queue.Task, error) {
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
+	tasks := make([]queue.Task, 0)
+	for _, t := range i.tasks {
+		if lo.Contains(queue.NonTerminateStatus(), t.Status()) {
+			tasks = append(tasks, t)
+		}
+	}
+
+	return tasks, nil
 }
