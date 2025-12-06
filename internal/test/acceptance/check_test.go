@@ -2,6 +2,7 @@ package acceptance_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -124,4 +125,50 @@ func TestCheckLatency(t *testing.T) {
 	require.Equal(t, checker.KindLatency, tk.CheckerKind())
 	require.Equal(t, px.ID(), tk.ProxyID())
 	require.Equal(t, expectedResult, tk.State().Result())
+}
+
+func TestCheckWithCheckerError(t *testing.T) {
+	t.Parallel()
+
+	var (
+		ctx = context.Background()
+		now = time.Now()
+	)
+	app := test.NewApp(t)
+
+	app.Mocks().LatencyChecker().
+		EXPECT().
+		Run(gomock.Any(), gomock.Any()).
+		Return(task.Result{}, errors.ErrUnsupported)
+
+	res, err := app.Commands().Check().Execute(
+		ctx,
+		command.CheckInput{
+			OperationTime: now,
+			Proxies:       []string{"https://proxy.io"},
+			Checkers: []checker.Kind{
+				checker.KindLatency,
+			},
+		},
+	)
+	require.NoError(t, err)
+	app.WaitTasksTerminated()
+
+	proxies, err := app.Ports().GetProxies().Execute(ctx)
+	require.NoError(t, err)
+	require.Len(t, proxies, 1)
+
+	px := proxies[0]
+	require.EqualValues(t, "https://proxy.io", px.URL())
+	require.EqualValues(t, "https", px.Protocol())
+
+	tasks, err := app.Ports().GetTasks().Execute(ctx)
+	require.NoError(t, err)
+	require.Len(t, tasks, 1)
+
+	tk := tasks[0]
+	require.Equal(t, res.TaskGroupID, tk.GroupID())
+	require.Equal(t, task.StatusFailure, tk.Status())
+	require.Equal(t, checker.KindLatency, tk.CheckerKind())
+	require.Equal(t, px.ID(), tk.ProxyID())
 }

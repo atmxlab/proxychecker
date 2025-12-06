@@ -38,10 +38,10 @@ func (w *resultsWorker) run(ctx context.Context) {
 		switch {
 		case res.err == nil:
 			res.task.status = StatusSuccess
-		case errors.Is(res.err, ErrNonRetriable):
-			res.task.status = StatusFailure
-		default:
+		case errors.Is(res.err, ErrRetriable):
 			res.task.status = StatusPending
+		default:
+			res.task.status = StatusFailure
 		}
 
 		logrus.Infof("result: task_id: [%s], status: [%s], err: [%v]", res.task.id, res.task.status, res.err)

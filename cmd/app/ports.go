@@ -16,6 +16,7 @@ type Ports struct {
 	getTasksByGroupID       port.GetTasksByGroupID
 	scheduleTask            port.ScheduleTask
 	getTaskAgg              port.GetTaskAgg
+	getTaskAggsByGroupID    port.GetTaskAggsByGroupID
 	saveTaskAgg             port.SaveTaskAgg
 	runTx                   port.RunTx
 }
@@ -62,6 +63,10 @@ func (p Ports) ScheduleTask() port.ScheduleTask {
 
 func (p Ports) GetTaskAgg() port.GetTaskAgg {
 	return p.getTaskAgg
+}
+
+func (p Ports) GetTaskAggsByGroupID() port.GetTaskAggsByGroupID {
+	return p.getTaskAggsByGroupID
 }
 
 func (p Ports) SaveTaskAgg() port.SaveTaskAgg {
@@ -136,6 +141,11 @@ func (pb *PortsBuilder) ScheduleTask(p port.ScheduleTask) *PortsBuilder {
 
 func (pb *PortsBuilder) GetTaskAgg(p port.GetTaskAgg) *PortsBuilder {
 	pb.c.ports.getTaskAgg = p
+	return pb
+}
+
+func (pb *PortsBuilder) GetTaskAggsByGroupID(p port.GetTaskAggsByGroupID) *PortsBuilder {
+	pb.c.ports.getTaskAggsByGroupID = p
 	return pb
 }
 

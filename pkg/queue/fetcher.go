@@ -24,18 +24,18 @@ func (f *fetcher) run(ctx context.Context, kind Kind) {
 	for {
 		select {
 		case <-ctx.Done():
-			logrus.Infof("context done: kind: [%d]", kind)
+			logrus.Infof("context done: kind: [%s]", kind)
 			return
 		default:
 			tasks, err := f.fetch(ctx, kind)
 			switch {
 			case err != nil:
-				logrus.Errorf("fetcher.fetch: kind: [%d], err: [%s]", kind, err)
+				logrus.Errorf("fetcher.fetch: kind: [%s], err: [%s]", kind, err)
 				time.Sleep(5 * time.Second) // TODO: cfg
 			case len(tasks) == 0:
-				logrus.Infof("fetcher.fetch: kind: [%d], no tasks", kind)
+				logrus.Infof("fetcher.fetch: kind: [%s], no tasks", kind)
 			default:
-				logrus.Infof("fetcher.fetch: kind: [%d], len: [%d]", kind, len(tasks))
+				logrus.Infof("fetcher.fetch: kind: [%s], len: [%d]", kind, len(tasks))
 				for _, t := range tasks {
 					f.tasksCh <- t
 				}

@@ -21,15 +21,42 @@ func NewGetTaskAgg(getTask port.GetTask, getProxy port.GetProxy) *GetTaskAgg {
 func (g *GetTaskAgg) Execute(ctx context.Context, id task.ID) (*aggregate.Task, error) {
 	t, err := g.getTask.Execute(ctx, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "get task")
+		return nil, errors.Wrap(err, "getTask.Execute")
 	}
 
 	p, err := g.getProxy.Execute(ctx, t.ProxyID())
 	if err != nil {
-		return nil, errors.Wrap(err, "get proxy")
+		return nil, errors.Wrap(err, "getProxy.Execute")
 	}
 
 	return aggregate.NewTask(t, p), nil
+}
+
+type GetTaskAggsByGroupID struct {
+	getTasksByGroupID port.GetTasksByGroupID
+	getProxy          port.GetProxy
+}
+
+func NewGetTaskAggsByGroupID(getTasksByGroupID port.GetTasksByGroupID, getProxy port.GetProxy) *GetTaskAggsByGroupID {
+	return &GetTaskAggsByGroupID{getTasksByGroupID: getTasksByGroupID, getProxy: getProxy}
+}
+
+func (g *GetTaskAggsByGroupID) Execute(ctx context.Context, groupID task.GroupID) ([]*aggregate.Task, error) {
+	tasks, err := g.getTasksByGroupID.Execute(ctx, groupID)
+	if err != nil {
+		return nil, errors.Wrap(err, "getTasksByGroupID.Execute")
+	}
+
+	aggs := make([]*aggregate.Task, 0, len(tasks))
+	for _, tk := range tasks {
+		px, err := g.getProxy.Execute(ctx, tk.ProxyID())
+		if err != nil {
+			return nil, errors.Wrap(err, "getProxy.Execute")
+		}
+		aggs = append(aggs, aggregate.NewTask(tk, px))
+	}
+
+	return aggs, nil
 }
 
 type SaveTaskAgg struct {

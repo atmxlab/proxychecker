@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/atmxlab/proxychecker/pkg/errors"
+	"github.com/atmxlab/proxychecker/pkg/waiter"
+	"github.com/sirupsen/logrus"
 )
 
 type App struct {
@@ -30,4 +32,23 @@ func (a *App) Start(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (a *App) WaitTasksTerminated(ctx context.Context, opts ...waiter.Option) error {
+	return waiter.Wait(func() (bool, error) {
+		if ctx.Err() != nil {
+			return false, errors.Wrap(ctx.Err(), "ctx error")
+		}
+
+		tasks, err := a.Container().Entities().Queue().GetNonTerminatedTasks(ctx)
+		if err != nil {
+			return false, errors.Wrap(err, "container.Entities.Queue.GetNonTerminatedTasks")
+		}
+		if len(tasks) == 0 {
+			return true, nil
+		}
+
+		logrus.Infof("waiting tasks terminated with: count: [%d]", len(tasks))
+		return false, nil
+	}, opts...)
 }

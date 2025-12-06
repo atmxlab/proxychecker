@@ -38,7 +38,7 @@ func (s *ScheduleTask) Execute(ctx context.Context, tasks ...stask.Task) error {
 			ID(queue.NewID()).
 			Kind(t.Kind().ToQueue()).
 			ExternalID(t.Key()).
-			Status(queue.StatusPending).
+			Status(queue.StatusPending). // TODO: не разрешать управлять статусом снаружи
 			Payload(bytes).
 			CreatedAt(s.timeProvider.CurrentTime(ctx)).
 			UpdatedAt(s.timeProvider.CurrentTime(ctx)).

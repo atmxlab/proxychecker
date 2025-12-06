@@ -34,3 +34,15 @@ func (t *Task) Success(res task.Result) error {
 
 	return nil
 }
+
+func (t *Task) Failure(res task.Result) error {
+	err := t.task.Modify(func(m *entity.TaskModifier) error {
+		m.Failure(res)
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "t.Modify")
+	}
+
+	return nil
+}

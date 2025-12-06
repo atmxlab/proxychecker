@@ -99,11 +99,11 @@ func (a *App) WaitTasksTerminated() {
 				return true
 			}
 
-			a.t.Logf("wating tasks terminated with [%d] tasks: %v", len(tasks), tasks)
+			a.t.Logf("waiting tasks terminated with [%d] tasks: %v", len(tasks), tasks)
 			return false
 		},
 		3*time.Second,
 		300*time.Millisecond,
-		"wating task terminated timed out",
+		"waiting task terminated timed out",
 	)
 }

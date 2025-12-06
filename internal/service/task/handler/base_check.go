@@ -47,6 +47,15 @@ func (c *BaseCheckHandler) Handle(ctx context.Context, qt queue.Task) error {
 
 	res, err := c.checker.Run(ctx, t)
 	if err != nil {
+		if failureErr := t.Failure(task.Result{
+			// TODO: тут нужно понять, какую ошибку возвращает и правильный код присваивать
+			ErrorResult: &task.ErrorResult{
+				Code:    task.ErrCodeUnknown,
+				Message: err.Error(),
+			},
+		}); failureErr != nil {
+			return errors.Wrap(failureErr, "checker.Run")
+		}
 		return errors.Wrap(err, "checker.Run")
 	}
 

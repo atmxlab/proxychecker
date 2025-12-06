@@ -14,6 +14,6 @@ func NewClientFactory() *ClientFactory {
 }
 
 func (c ClientFactory) Create(p *entity.Proxy) client.Client {
-	// return http.NewClient(p.URL())
-	return http.NewClient("") // TODO: remove
+	return http.NewClient(p.URL())
+	// return http.NewClient("") // TODO: remove
 }

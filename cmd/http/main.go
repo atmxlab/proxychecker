@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/atmxlab/atmc"
 	"github.com/atmxlab/proxychecker/cmd/app"
+	"github.com/atmxlab/proxychecker/internal/pkg/config"
 	_ "github.com/atmxlab/proxychecker/pkg/logger"
 )
 
@@ -15,17 +15,12 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	scanner, err := atmc.New().Load("config/config.atmc")
+	appCfg, err := config.LoadAndScan[app.Config]("config/app.atmc")
 	if err != nil {
 		panic(err)
 	}
 
-	var cfg app.Config
-	if err = scanner.Scan(&cfg); err != nil {
-		panic(err)
-	}
-
-	cb := app.SetupContainerBuilder(cfg)
+	cb := app.SetupContainerBuilder(appCfg)
 	a := app.NewApp(cb.Build())
 
 	a.Init()

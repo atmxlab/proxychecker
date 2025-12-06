@@ -49,6 +49,10 @@ func SetupContainerBuilder(cfg Config) *ContainerBuilder {
 					pb.Container().Ports().GetTask(),
 					pb.Container().Ports().GetProxy(),
 				)).
+				GetTaskAggsByGroupID(inmemory.NewGetTaskAggsByGroupID(
+					pb.Container().Ports().GetTasksByGroupID(),
+					pb.Container().Ports().GetProxy(),
+				)).
 				SaveTaskAgg(
 					inmemory.NewSaveTaskAgg(pb.Container().Ports().UpdateTask()),
 				)

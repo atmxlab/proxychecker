@@ -81,3 +81,8 @@ func (m *TaskModifier) Success(res task.Result) {
 	m.t.status = task.StatusSuccess
 	m.t.state = m.t.state.SetResult(res)
 }
+
+func (m *TaskModifier) Failure(res task.Result) {
+	m.t.status = task.StatusFailure
+	m.t.state = m.t.state.SetResult(res)
+}

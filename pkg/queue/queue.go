@@ -42,12 +42,12 @@ func (q *Queue) Add(k Kind, h Handler, opts ...Option) {
 
 func (q *Queue) Run(ctx context.Context) error {
 	for _, h := range q.handlers {
-		logrus.Infof("run queue: kind: [%d], workers count: [%d]", h.kind, h.options.workerCount)
+		logrus.Infof("run queue: kind: [%s], workers count: [%d]", h.kind, h.options.workerCount)
 
 		tasksCh := make(chan Task, q.bufferSize)
 		resultsCh := make(chan result, q.bufferSize)
 
-		logrus.Infof("run tasks workers: kind: [%d], count: [%d]", h.kind, h.options.workerCount)
+		logrus.Infof("run tasks workers: kind: [%s], count: [%d]", h.kind, h.options.workerCount)
 		q.wg.Add(1)
 		go func() {
 			defer q.wg.Done()
@@ -55,14 +55,14 @@ func (q *Queue) Run(ctx context.Context) error {
 			q.runTasksWorkers(ctx, tasksCh, resultsCh, h)
 		}()
 
-		logrus.Infof("run results workers: kind: [%d], count: [%d]", h.kind, h.options.workerCount)
+		logrus.Infof("run results workers: kind: [%s], count: [%d]", h.kind, h.options.workerCount)
 		q.wg.Add(1)
 		go func() {
 			defer q.wg.Done()
 			q.runResultsWorkers(ctx, resultsCh, h)
 		}()
 
-		logrus.Infof("run fetcher: kind: [%d]", h.kind)
+		logrus.Infof("run fetcher: kind: [%s]", h.kind)
 		// Достает таски и кладет в канал.
 		f := newFetcher(tasksCh, q.repo)
 		q.wg.Add(1)
