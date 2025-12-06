@@ -25,7 +25,8 @@ func main() {
 		panic(err)
 	}
 
-	a := app.NewApp(cfg)
+	cb := app.SetupContainerBuilder(cfg)
+	a := app.NewApp(cb.Build())
 
 	a.Init()
 

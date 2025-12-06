@@ -10,11 +10,19 @@ func (c Commands) Check() *command.CheckCommand {
 	return c.checkCommand
 }
 
-func (a *App) initCommands() {
-	a.commands.checkCommand = command.NewCheckCommand(
-		a.ports.runTx,
-		a.ports.insertProxy,
-		a.ports.insertTask,
-		a.ports.scheduleTask,
-	)
+type CommandsBuilder struct {
+	c *Container
+}
+
+func newCommandsBuilder(c *Container) *CommandsBuilder {
+	return &CommandsBuilder{c: c}
+}
+
+func (cb *CommandsBuilder) Container() *Container {
+	return cb.c
+}
+
+func (cb *CommandsBuilder) Check(c *command.CheckCommand) *CommandsBuilder {
+	cb.c.commands.checkCommand = c
+	return cb
 }

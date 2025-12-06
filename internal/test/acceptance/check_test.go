@@ -9,6 +9,7 @@ import (
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
 	"github.com/atmxlab/proxychecker/internal/service/command"
 	"github.com/atmxlab/proxychecker/internal/test"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,6 +21,21 @@ func TestCheckLatency(t *testing.T) {
 		now = time.Now()
 	)
 	app := test.NewApp(t)
+
+	app.Mocks().GeoChecker().
+		EXPECT().
+		Run(gomock.Any(), gomock.Any()).
+		Return(task.Result{
+			GEOResult: &task.GEOResult{
+				ContinentCode: "Eurasia",
+				Continent:     "Eurasia",
+				CountryCode:   "USA",
+				Country:       "USA",
+				Region:        "New-York",
+				City:          "New-York",
+				Timezone:      "USA",
+			},
+		}, nil)
 
 	res, err := app.Commands().Check().Execute(
 		ctx,
@@ -51,6 +67,5 @@ func TestCheckLatency(t *testing.T) {
 	require.Equal(t, task.StatusSuccess, tk.Status())
 	require.Equal(t, checker.KindGEO, tk.CheckerKind())
 	require.Equal(t, px.ID(), tk.ProxyID())
-	require.Equal(t, "RU", tk.State().Result().GEOResult.CountryCode)
-
+	require.Equal(t, "USA", tk.State().Result().GEOResult.CountryCode)
 }

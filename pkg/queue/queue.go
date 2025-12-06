@@ -31,6 +31,12 @@ func (q *Queue) Add(k Kind, h Handler, opts ...Option) {
 		o(&opt)
 	}
 
+	for _, hh := range q.handlers {
+		if hh.kind == k {
+			panic(errors.Newf("queue handler already exists: kind: [%s]", k))
+		}
+	}
+
 	q.handlers = append(q.handlers, newHandler(k, h, opt))
 }
 

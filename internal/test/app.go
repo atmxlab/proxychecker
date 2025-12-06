@@ -7,13 +7,16 @@ import (
 	"time"
 
 	"github.com/atmxlab/proxychecker/cmd/app"
+	handlermocks "github.com/atmxlab/proxychecker/internal/service/task/handler/mocks"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
 
 type App struct {
-	t   *testing.T
-	ctx context.Context
-	app *app.App
+	t     *testing.T
+	ctx   context.Context
+	mocks Mocks
+	app   *app.App
 }
 
 func NewApp(t *testing.T) *App {
@@ -25,8 +28,19 @@ func NewApp(t *testing.T) *App {
 			QueueBufferSize:  2,
 		},
 	}
+	ctrl := gomock.NewController(t)
+	mocks := Mocks{
+		geoChecker:     handlermocks.NewMockChecker(ctrl),
+		latencyChecker: handlermocks.NewMockChecker(ctrl),
+	}
 
-	a := app.NewApp(cfg)
+	cb := app.SetupContainerBuilder(cfg)
+	cb.WithCheckers(func(cb *app.CheckersBuilder) {
+		cb.
+			GEO(mocks.geoChecker).
+			Latency(mocks.latencyChecker)
+	})
+	a := app.NewApp(cb.Build())
 
 	a.Init()
 
@@ -42,22 +56,44 @@ func NewApp(t *testing.T) *App {
 		wg.Wait()
 	})
 
-	return &App{t: t, app: a, ctx: ctx}
+	return &App{
+		t:     t,
+		ctx:   ctx,
+		app:   a,
+		mocks: mocks,
+	}
 }
 
 func (a *App) Commands() app.Commands {
-	return a.app.Commands()
+	return a.app.Container().Commands()
 }
 
 func (a *App) Ports() app.Ports {
-	return a.app.Ports()
+	return a.app.Container().Ports()
+}
+
+func (a *App) Mocks() Mocks {
+	return a.mocks
+}
+
+type Mocks struct {
+	geoChecker     *handlermocks.MockChecker
+	latencyChecker *handlermocks.MockChecker
+}
+
+func (m Mocks) GeoChecker() *handlermocks.MockChecker {
+	return m.geoChecker
+}
+
+func (m Mocks) LatencyChecker() *handlermocks.MockChecker {
+	return m.latencyChecker
 }
 
 func (a *App) WaitTasksTerminated() {
 	require.Eventuallyf(
 		a.t,
 		func() bool {
-			tasks, err := a.app.Queue().GetNonTerminatedTasks(a.ctx)
+			tasks, err := a.app.Container().Entities().Queue().GetNonTerminatedTasks(a.ctx)
 			require.NoError(a.t, err)
 			if len(tasks) == 0 {
 				return true

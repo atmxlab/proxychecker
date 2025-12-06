@@ -11,6 +11,7 @@ import (
 	"github.com/atmxlab/proxychecker/pkg/queue"
 )
 
+//go:generate mock Checker
 type Checker interface {
 	Run(ctx context.Context, t *aggregate.Task) (task.Result, error)
 }
