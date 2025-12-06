@@ -5,6 +5,7 @@ import (
 
 	"github.com/atmxlab/proxychecker/internal/domain/entity"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/proxy"
+	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
 )
 
 type InsertProxy interface {
@@ -17,4 +18,8 @@ type GetProxy interface {
 
 type GetProxies interface {
 	Execute(ctx context.Context) ([]*entity.Proxy, error)
+}
+
+type GetProxiesByTaskGroupID interface {
+	Execute(ctx context.Context, groupID task.GroupID) ([]*entity.Proxy, error)
 }

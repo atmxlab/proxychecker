@@ -7,6 +7,7 @@ import (
 	"github.com/atmxlab/proxychecker/internal/domain/entity"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/proxy"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
+	"github.com/atmxlab/proxychecker/internal/port"
 	"github.com/atmxlab/proxychecker/pkg/errors"
 	"github.com/samber/lo"
 )
@@ -72,6 +73,35 @@ func (r *GetProxy) Execute(ctx context.Context, id proxy.ID) (*entity.Proxy, err
 	}
 
 	return nil, errors.NotFoundf("proxy not found: id: [%s]", id)
+}
+
+type GetProxiesByTaskGroupID struct {
+	state             *ProxySharedState
+	getTasksByGroupID port.GetTasksByGroupID
+}
+
+func NewGetProxiesByTaskGroupID(
+	state *ProxySharedState,
+	getTasksByGroupID port.GetTasksByGroupID,
+) *GetProxiesByTaskGroupID {
+	return &GetProxiesByTaskGroupID{state: state, getTasksByGroupID: getTasksByGroupID}
+}
+
+func (r *GetProxiesByTaskGroupID) Execute(ctx context.Context, groupID task.GroupID) ([]*entity.Proxy, error) {
+	r.state.mu.Lock()
+	defer r.state.mu.Unlock()
+
+	tasks, err := r.getTasksByGroupID.Execute(ctx, groupID)
+	if err != nil {
+		return nil, errors.Wrapf(err, "getTasksByGroupID.Execute: [%s]", groupID)
+	}
+
+	proxies := make(map[proxy.ID]*entity.Proxy)
+	for _, tk := range tasks {
+		proxies[tk.ProxyID()] = r.state.proxies[tk.ProxyID()]
+	}
+
+	return lo.Values(proxies), nil
 }
 
 type TaskSharedState struct {

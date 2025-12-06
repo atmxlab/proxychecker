@@ -5,18 +5,19 @@ import (
 )
 
 type Ports struct {
-	insertProxy       port.InsertProxy
-	getProxy          port.GetProxy
-	getProxies        port.GetProxies
-	insertTask        port.InsertTask
-	updateTask        port.UpdateTask
-	getTask           port.GetTask
-	getTasks          port.GetTasks
-	getTasksByGroupID port.GetTasksByGroupID
-	scheduleTask      port.ScheduleTask
-	getTaskAgg        port.GetTaskAgg
-	saveTaskAgg       port.SaveTaskAgg
-	runTx             port.RunTx
+	insertProxy             port.InsertProxy
+	getProxy                port.GetProxy
+	getProxies              port.GetProxies
+	getProxiesByTaskGroupID port.GetProxiesByTaskGroupID
+	insertTask              port.InsertTask
+	updateTask              port.UpdateTask
+	getTask                 port.GetTask
+	getTasks                port.GetTasks
+	getTasksByGroupID       port.GetTasksByGroupID
+	scheduleTask            port.ScheduleTask
+	getTaskAgg              port.GetTaskAgg
+	saveTaskAgg             port.SaveTaskAgg
+	runTx                   port.RunTx
 }
 
 func (p Ports) GetTasksByGroupID() port.GetTasksByGroupID {
@@ -29,6 +30,10 @@ func (p Ports) GetTasks() port.GetTasks {
 
 func (p Ports) GetProxies() port.GetProxies {
 	return p.getProxies
+}
+
+func (p Ports) GetProxiesByTaskGroupID() port.GetProxiesByTaskGroupID {
+	return p.getProxiesByTaskGroupID
 }
 
 func (p Ports) InsertTask() port.InsertTask {
@@ -91,6 +96,11 @@ func (pb *PortsBuilder) GetProxy(p port.GetProxy) *PortsBuilder {
 
 func (pb *PortsBuilder) GetProxies(p port.GetProxies) *PortsBuilder {
 	pb.c.ports.getProxies = p
+	return pb
+}
+
+func (pb *PortsBuilder) GetProxiesByTaskGroupID(p port.GetProxiesByTaskGroupID) *PortsBuilder {
+	pb.c.ports.getProxiesByTaskGroupID = p
 	return pb
 }
 

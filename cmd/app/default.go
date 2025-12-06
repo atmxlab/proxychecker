@@ -25,19 +25,24 @@ func SetupContainerBuilder(cfg Config) *ContainerBuilder {
 		WithPorts(func(pb *PortsBuilder) {
 			pb.RunTx(inmemory.NewRunTx())
 
-			proxySharedState := inmemory.NewProxySharedState()
-			pb.
-				InsertProxy(inmemory.NewInsertProxy(proxySharedState)).
-				GetProxy(inmemory.NewGetProxy(proxySharedState)).
-				GetProxies(inmemory.NewGetProxies(proxySharedState))
-
 			taskSharedState := inmemory.NewTaskSharedState()
+			getTasksByGroupID := inmemory.NewGetTasksByGroupID(taskSharedState)
 			pb.
 				InsertTask(inmemory.NewInsertTask(taskSharedState)).
 				UpdateTask(inmemory.NewUpdateTask(taskSharedState)).
 				GetTask(inmemory.NewGetTask(taskSharedState)).
 				GetTasks(inmemory.NewGetTasks(taskSharedState)).
-				GetTasksByGroupID(inmemory.NewGetTasksByGroupID(taskSharedState))
+				GetTasksByGroupID(getTasksByGroupID)
+
+			proxySharedState := inmemory.NewProxySharedState()
+			pb.
+				InsertProxy(inmemory.NewInsertProxy(proxySharedState)).
+				GetProxy(inmemory.NewGetProxy(proxySharedState)).
+				GetProxies(inmemory.NewGetProxies(proxySharedState)).
+				GetProxiesByTaskGroupID(inmemory.NewGetProxiesByTaskGroupID(
+					proxySharedState,
+					getTasksByGroupID,
+				))
 
 			pb.
 				GetTaskAgg(inmemory.NewGetTaskAgg(
