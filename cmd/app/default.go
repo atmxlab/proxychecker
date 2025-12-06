@@ -64,7 +64,11 @@ func SetupContainerBuilder(cfg Config) *ContainerBuilder {
 					cb.Container().Entities().ClientFactory(),
 					cb.Container().Entities().IpApiFactory(),
 				)).
-				Latency(latency.New())
+				Latency(latency.New(
+					cb.Container().Entities().ClientFactory(),
+					cb.Container().Entities().IpApiFactory(),
+					cb.Container().Entities().TimeProvider(),
+				))
 		}).
 		WithCommands(func(pb *CommandsBuilder) {
 			pb.Check(command.NewCheckCommand(

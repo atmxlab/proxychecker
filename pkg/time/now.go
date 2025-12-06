@@ -5,10 +5,6 @@ import (
 	"time"
 )
 
-type Provider interface {
-	CurrentTime(ctx context.Context) time.Time
-}
-
 type NowProvider struct {
 }
 
@@ -18,4 +14,8 @@ func NewNowProvider() NowProvider {
 
 func (n NowProvider) CurrentTime(_ context.Context) time.Time {
 	return time.Now()
+}
+
+func (n NowProvider) Since(ctx context.Context, t time.Time) time.Duration {
+	return n.CurrentTime(ctx).Sub(t)
 }
