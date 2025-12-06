@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/atmxlab/proxychecker/internal/details/client"
 	"github.com/atmxlab/proxychecker/pkg/errors"
 )
 
@@ -15,27 +16,36 @@ type Client struct {
 	client *http.Client
 }
 
-func NewClient(proxyURL string) *Client {
+func NewClient(cfg client.Config) *Client {
 	// TODO: cfg
 	return &Client{
 		client: &http.Client{
 			Transport: &http.Transport{
 				Proxy: func(r *http.Request) (*url.URL, error) {
-					if proxyURL == "" { // TODO: remove
+					if cfg.ProxyURL() == "" {
 						return nil, nil
 					}
 
-					return url.Parse(proxyURL)
+					return url.Parse(cfg.ProxyURL())
 				},
-				DialContext: (&net.Dialer{
-					Timeout:   3 * time.Second,
-					KeepAlive: 3 * time.Second,
-				}).DialContext,
+				DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+					conn, err := (&net.Dialer{
+						Timeout:   3 * time.Second,
+						KeepAlive: 3 * time.Second,
+					}).DialContext(ctx, network, addr)
+
+					if hook := cfg.AfterDialHook(); hook != nil {
+						hook()
+					}
+
+					return conn, err
+				},
 				ForceAttemptHTTP2:     true,
 				MaxIdleConns:          100,
 				IdleConnTimeout:       3 * time.Second,
 				TLSHandshakeTimeout:   1 * time.Second,
 				ExpectContinueTimeout: 1 * time.Second,
+				DisableKeepAlives:     cfg.DisableKeepAlives(),
 			},
 			CheckRedirect: nil,
 			Jar:           nil,

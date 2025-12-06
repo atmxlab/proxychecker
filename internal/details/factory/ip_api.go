@@ -1,7 +1,7 @@
 package factory
 
 import (
-	"github.com/atmxlab/proxychecker/internal/details/checker/geo"
+	"github.com/atmxlab/proxychecker/internal/details/checker"
 	"github.com/atmxlab/proxychecker/internal/details/client"
 	"github.com/atmxlab/proxychecker/internal/details/service/ipapi"
 )
@@ -13,6 +13,6 @@ func NewIPApiFactory() *IPApiFactory {
 	return &IPApiFactory{}
 }
 
-func (I IPApiFactory) Create(cl client.Client) geo.IPApi {
+func (I IPApiFactory) Create(cl client.Client) checker.IPApi {
 	return ipapi.New(cl)
 }

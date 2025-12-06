@@ -26,14 +26,15 @@ func (r Result) String() string {
 }
 
 type LatencyResult struct {
-	LatencyToProxy  time.Duration `json:"latencyToProxy"`
-	LatencyToTarget time.Duration `json:"latencyToTarget"`
+	FromHostToProxyRoundTrip   time.Duration `json:"fromHostToProxyRoundTrip"`
+	FromHostToTargetRoundTrip  time.Duration `json:"fromHostToTargetRoundTrip"`
+	FromProxyToTargetRoundTrip time.Duration `json:"fromProxyToTargetRoundTrip"`
 }
 
 func (r *LatencyResult) String() string {
 	return fmt.Sprintf(
-		"latencyToProxy: [%s], latencyToTarget: [%s]",
-		r.LatencyToProxy, r.LatencyToTarget,
+		"fromHostToProxyRoundTrip: [%s], fromHostToTargetRoundTrip: [%s], fromProxyToTargetRoundTrip: [%s]",
+		r.FromHostToProxyRoundTrip, r.FromHostToTargetRoundTrip, r.FromProxyToTargetRoundTrip,
 	)
 }
 

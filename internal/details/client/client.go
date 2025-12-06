@@ -2,8 +2,6 @@ package client
 
 import (
 	"context"
-
-	"github.com/atmxlab/proxychecker/internal/domain/entity"
 )
 
 type Client interface {
@@ -11,5 +9,5 @@ type Client interface {
 }
 
 type Factory interface {
-	Create(p *entity.Proxy) Client
+	Create(opts ...Option) Client
 }

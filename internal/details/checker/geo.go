@@ -1,34 +1,25 @@
-package geo
+package checker
 
 import (
 	"context"
 
 	"github.com/atmxlab/proxychecker/internal/details/client"
-	"github.com/atmxlab/proxychecker/internal/details/service/ipapi"
 	"github.com/atmxlab/proxychecker/internal/domain/aggregate"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
 	"github.com/atmxlab/proxychecker/pkg/errors"
 )
 
-type IPApi interface {
-	Get(ctx context.Context) (ipapi.Output, error)
-}
-
-type IPApiFactory interface {
-	Create(client client.Client) IPApi
-}
-
-type Checker struct {
-	clientFactory client.Factory
+type GeoChecker struct {
+	clientFactory ClientFactory
 	ipApiFactory  IPApiFactory
 }
 
-func New(clientFactory client.Factory, ipApiFactory IPApiFactory) *Checker {
-	return &Checker{clientFactory: clientFactory, ipApiFactory: ipApiFactory}
+func NewGeoChecker(clientFactory ClientFactory, ipApiFactory IPApiFactory) *GeoChecker {
+	return &GeoChecker{clientFactory: clientFactory, ipApiFactory: ipApiFactory}
 }
 
-func (c *Checker) Run(ctx context.Context, agg *aggregate.Task) (task.Result, error) {
-	cl := c.clientFactory.Create(agg.Proxy())
+func (c *GeoChecker) Run(ctx context.Context, agg *aggregate.Task) (task.Result, error) {
+	cl := c.clientFactory.Create(client.WithProxyURL(agg.Proxy().URL()))
 	ipApi := c.ipApiFactory.Create(cl)
 
 	output, err := ipApi.Get(ctx)

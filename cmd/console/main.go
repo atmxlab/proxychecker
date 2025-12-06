@@ -100,6 +100,24 @@ func main() {
 		}
 	}
 
+	// TODO: grpc + http + swagger
+	// TODO: contract with all info:
+	//  - proxies count
+	//  - tasks count (all + proxy)
+	//  - success tasks count (all + proxy)
+	//  - failure tasks count (all + proxy)
+	//  - pending tasks count (all + proxy)
+	//  - progress percentage
+	//  - geo aggregate
+	//  - protocol aggregate
+	//  - proxy type aggregate
+	//  - sort by success tasks and priority results
+	//  - flag of done
+
+	// TODO: proxy agg
+	// TODO: group agg
+	// TODO: group result query
+	// TODO: deploy with docker
 	fmt.Printf("all tasks: [%d]\n", len(tasks))
 	fmt.Printf("success tasks: [%d]\n", len(tasks)-failedTasks)
 	fmt.Printf("failed tasks: [%d]\n", failedTasks)

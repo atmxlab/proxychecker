@@ -1,8 +1,7 @@
 package app
 
 import (
-	"github.com/atmxlab/proxychecker/internal/details/checker/geo"
-	"github.com/atmxlab/proxychecker/internal/details/checker/latency"
+	"github.com/atmxlab/proxychecker/internal/details/checker"
 	"github.com/atmxlab/proxychecker/internal/details/factory"
 	"github.com/atmxlab/proxychecker/internal/details/repository/inmemory"
 	"github.com/atmxlab/proxychecker/internal/details/scheduler"
@@ -64,11 +63,11 @@ func SetupContainerBuilder(cfg Config) *ContainerBuilder {
 		}).
 		WithCheckers(func(cb *CheckersBuilder) {
 			cb.
-				GEO(geo.New(
+				GEO(checker.NewGeoChecker(
 					cb.Container().Entities().ClientFactory(),
 					cb.Container().Entities().IpApiFactory(),
 				)).
-				Latency(latency.New(
+				Latency(checker.NewLatencyChecker(
 					cb.Container().Entities().ClientFactory(),
 					cb.Container().Entities().IpApiFactory(),
 					cb.Container().Entities().TimeProvider(),

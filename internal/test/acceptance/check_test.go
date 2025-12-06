@@ -84,8 +84,8 @@ func TestCheckLatency(t *testing.T) {
 
 	expectedResult := task.Result{
 		LatencyResult: &task.LatencyResult{
-			LatencyToProxy:  1 * time.Second,
-			LatencyToTarget: 2 * time.Second,
+			FromHostToProxyRoundTrip:  1 * time.Second,
+			FromHostToTargetRoundTrip: 2 * time.Second,
 		},
 	}
 
