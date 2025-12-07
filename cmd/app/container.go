@@ -5,6 +5,7 @@ type Container struct {
 	entities Entities
 	ports    Ports
 	commands Commands
+	queries  Queries
 	checkers Checkers
 }
 
@@ -28,6 +29,10 @@ func (c *Container) Commands() Commands {
 	return c.commands
 }
 
+func (c *Container) Queries() Queries {
+	return c.queries
+}
+
 func (c *Container) Checkers() Checkers {
 	return c.checkers
 }
@@ -38,6 +43,8 @@ type ContainerBuilder struct {
 	entitiesHooks   []func()
 	commandsBuilder *CommandsBuilder
 	commandsHooks   []func()
+	queriesBuilder  *QueriesBuilder
+	queriesHooks    []func()
 	checkersBuilder *CheckersBuilder
 	checkersHooks   []func()
 	portsBuilder    *PortsBuilder
@@ -51,6 +58,7 @@ func NewContainerBuilder() *ContainerBuilder {
 	cb.checkersBuilder = newCheckersBuilder(cb.c)
 	cb.entitiesBuilder = newEntitiesBuilder(cb.c)
 	cb.commandsBuilder = newCommandsBuilder(cb.c)
+	cb.queriesBuilder = newQueriesBuilder(cb.c)
 
 	return cb
 }
@@ -95,6 +103,14 @@ func (c *ContainerBuilder) WithCommands(hook func(cb *CommandsBuilder)) *Contain
 	return c
 }
 
+func (c *ContainerBuilder) WithQueries(hook func(cb *QueriesBuilder)) *ContainerBuilder {
+	c.queriesHooks = append(c.queriesHooks, func() {
+		hook(c.queriesBuilder)
+	})
+
+	return c
+}
+
 func (c *ContainerBuilder) Build() *Container {
 	for _, hook := range c.entitiesHooks {
 		hook()
@@ -106,6 +122,9 @@ func (c *ContainerBuilder) Build() *Container {
 		hook()
 	}
 	for _, hook := range c.commandsHooks {
+		hook()
+	}
+	for _, hook := range c.queriesHooks {
 		hook()
 	}
 

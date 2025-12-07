@@ -18,3 +18,7 @@ type GetTaskAggsByGroupID interface {
 type SaveTaskAgg interface {
 	Execute(ctx context.Context, agg *aggregate.Task) error
 }
+
+type GetGroupAgg interface {
+	Execute(ctx context.Context, groupID task.GroupID) (*aggregate.Group, error)
+}

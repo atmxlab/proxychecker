@@ -4,9 +4,12 @@ import (
 	"context"
 
 	"github.com/atmxlab/proxychecker/internal/domain/aggregate"
+	"github.com/atmxlab/proxychecker/internal/domain/entity"
+	"github.com/atmxlab/proxychecker/internal/domain/vo/proxy"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
 	"github.com/atmxlab/proxychecker/internal/port"
 	"github.com/atmxlab/proxychecker/pkg/errors"
+	"github.com/samber/lo"
 )
 
 type GetTaskAgg struct {
@@ -73,4 +76,36 @@ func (s *SaveTaskAgg) Execute(ctx context.Context, agg *aggregate.Task) error {
 	}
 
 	return nil
+}
+
+type GetGroupAgg struct {
+	getTasksByGroupID port.GetTasksByGroupID
+	getProxy          port.GetProxy
+}
+
+func NewGetGroupAgg(getTasksByGroupID port.GetTasksByGroupID, getProxy port.GetProxy) *GetGroupAgg {
+	return &GetGroupAgg{getTasksByGroupID: getTasksByGroupID, getProxy: getProxy}
+}
+
+func (g *GetGroupAgg) Execute(ctx context.Context, groupID task.GroupID) (*aggregate.Group, error) {
+	tasks, err := g.getTasksByGroupID.Execute(ctx, groupID)
+	if err != nil {
+		return nil, errors.Wrap(err, "getTasksByGroupID.Execute")
+	}
+
+	tasksByProxyID := lo.GroupBy(tasks, func(item *entity.Task) proxy.ID {
+		return item.ProxyID()
+	})
+
+	proxies := make([]*aggregate.Proxy, 0, len(tasksByProxyID))
+	for pxID, pxTasks := range tasksByProxyID {
+		px, err := g.getProxy.Execute(ctx, pxID)
+		if err != nil {
+			return nil, errors.Wrap(err, "getProxy.Execute")
+		}
+
+		proxies = append(proxies, aggregate.NewProxy(px, pxTasks))
+	}
+
+	return aggregate.NewGroup(proxies), nil
 }

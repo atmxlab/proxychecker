@@ -6,6 +6,7 @@ import (
 	"github.com/atmxlab/proxychecker/internal/details/repository/inmemory"
 	"github.com/atmxlab/proxychecker/internal/details/scheduler"
 	"github.com/atmxlab/proxychecker/internal/service/command"
+	"github.com/atmxlab/proxychecker/internal/service/query"
 	"github.com/atmxlab/proxychecker/pkg/queue"
 	queuerepo "github.com/atmxlab/proxychecker/pkg/queue/inmemory"
 	"github.com/atmxlab/proxychecker/pkg/time"
@@ -54,7 +55,11 @@ func SetupContainerBuilder(cfg Config) *ContainerBuilder {
 				)).
 				SaveTaskAgg(
 					inmemory.NewSaveTaskAgg(pb.Container().Ports().UpdateTask()),
-				)
+				).
+				GetGroupAgg(inmemory.NewGetGroupAgg(
+					pb.Container().Ports().GetTasksByGroupID(),
+					pb.Container().Ports().GetProxy(),
+				))
 
 			pb.ScheduleTask(scheduler.NewSchedulerTask(
 				pb.Container().Entities().Queue(),
@@ -79,6 +84,11 @@ func SetupContainerBuilder(cfg Config) *ContainerBuilder {
 				pb.Container().Ports().InsertProxy(),
 				pb.Container().Ports().InsertTask(),
 				pb.Container().Ports().ScheduleTask(),
+			))
+		}).
+		WithQueries(func(cb *QueriesBuilder) {
+			cb.CheckResult(query.NewCheckResultQuery(
+				cb.Container().Ports().GetGroupAgg(),
 			))
 		})
 }

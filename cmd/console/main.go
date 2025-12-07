@@ -29,11 +29,11 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	consoleCfg, err := config.LoadAndScan[Config]("config/console.atmc")
+	consoleCfg, err := config.LoadAndScan[Config]("config/console/console.atmc")
 	if err != nil {
 		panic(err)
 	}
-	appCfg, err := config.LoadAndScan[app.Config]("config/app.atmc")
+	appCfg, err := config.LoadAndScan[app.Config]("config/common/common.atmc")
 	if err != nil {
 		panic(err)
 	}

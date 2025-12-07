@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Proxychecker_Check_FullMethodName = "/proxychecker.Proxychecker/Check"
+	Proxychecker_Check_FullMethodName       = "/proxychecker.Proxychecker/Check"
+	Proxychecker_CheckResult_FullMethodName = "/proxychecker.Proxychecker/CheckResult"
 )
 
 // ProxycheckerClient is the client API for Proxychecker service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProxycheckerClient interface {
 	Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*CheckResponse, error)
+	CheckResult(ctx context.Context, in *CheckResultRequest, opts ...grpc.CallOption) (*CheckResultResponse, error)
 }
 
 type proxycheckerClient struct {
@@ -47,11 +49,22 @@ func (c *proxycheckerClient) Check(ctx context.Context, in *CheckRequest, opts .
 	return out, nil
 }
 
+func (c *proxycheckerClient) CheckResult(ctx context.Context, in *CheckResultRequest, opts ...grpc.CallOption) (*CheckResultResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckResultResponse)
+	err := c.cc.Invoke(ctx, Proxychecker_CheckResult_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProxycheckerServer is the server API for Proxychecker service.
 // All implementations must embed UnimplementedProxycheckerServer
 // for forward compatibility.
 type ProxycheckerServer interface {
 	Check(context.Context, *CheckRequest) (*CheckResponse, error)
+	CheckResult(context.Context, *CheckResultRequest) (*CheckResultResponse, error)
 	mustEmbedUnimplementedProxycheckerServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedProxycheckerServer struct{}
 
 func (UnimplementedProxycheckerServer) Check(context.Context, *CheckRequest) (*CheckResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Check not implemented")
+}
+func (UnimplementedProxycheckerServer) CheckResult(context.Context, *CheckResultRequest) (*CheckResultResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CheckResult not implemented")
 }
 func (UnimplementedProxycheckerServer) mustEmbedUnimplementedProxycheckerServer() {}
 func (UnimplementedProxycheckerServer) testEmbeddedByValue()                      {}
@@ -104,6 +120,24 @@ func _Proxychecker_Check_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Proxychecker_CheckResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckResultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProxycheckerServer).CheckResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Proxychecker_CheckResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProxycheckerServer).CheckResult(ctx, req.(*CheckResultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Proxychecker_ServiceDesc is the grpc.ServiceDesc for Proxychecker service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var Proxychecker_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Check",
 			Handler:    _Proxychecker_Check_Handler,
+		},
+		{
+			MethodName: "CheckResult",
+			Handler:    _Proxychecker_CheckResult_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

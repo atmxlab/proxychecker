@@ -29,7 +29,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -47,9 +47,177 @@
           "Proxychecker"
         ]
       }
+    },
+    "/proxychecker.Proxychecker/CheckResult": {
+      "post": {
+        "operationId": "Proxychecker_CheckResult",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/proxycheckerCheckResultResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/proxycheckerCheckResultRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Proxychecker"
+        ]
+      }
     }
   },
   "definitions": {
+    "CheckResultResponseProxiesStatistic": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "title": "Кол-во всех прокси"
+        },
+        "checkedCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "pendingCount": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "CheckResultResponseProxy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "isChecked": {
+          "type": "boolean"
+        },
+        "tasksStatistic": {
+          "$ref": "#/definitions/CheckResultResponseTasksStatistic"
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/proxycheckerTask"
+          }
+        }
+      }
+    },
+    "CheckResultResponseStatistic": {
+      "type": "object",
+      "properties": {
+        "proxies": {
+          "$ref": "#/definitions/CheckResultResponseProxiesStatistic"
+        },
+        "tasks": {
+          "$ref": "#/definitions/CheckResultResponseTasksStatistic"
+        }
+      }
+    },
+    "CheckResultResponseTasksStatistic": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "title": "Кол-во всех проверок"
+        },
+        "successCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "failureCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "pendingCount": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "TaskResultError": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskResultGEO": {
+      "type": "object",
+      "properties": {
+        "countryCode": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskResultLatency": {
+      "type": "object",
+      "properties": {
+        "fromHostToProxyRoundTrip": {
+          "type": "string",
+          "format": "int64"
+        },
+        "fromHostToTargetRoundTrip": {
+          "type": "string",
+          "format": "int64"
+        },
+        "fromProxyToTargetRoundTrip": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -93,24 +261,61 @@
         }
       }
     },
-    "rpcStatus": {
+    "proxycheckerCheckResultRequest": {
       "type": "object",
       "properties": {
-        "code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "message": {
+        "groupId": {
           "type": "string"
+        }
+      }
+    },
+    "proxycheckerCheckResultResponse": {
+      "type": "object",
+      "properties": {
+        "statistic": {
+          "$ref": "#/definitions/CheckResultResponseStatistic"
         },
-        "details": {
+        "proxies": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/protobufAny"
+            "$ref": "#/definitions/CheckResultResponseProxy"
           }
+        },
+        "isChecked": {
+          "type": "boolean"
         }
       }
+    },
+    "proxycheckerTask": {
+      "type": "object",
+      "properties": {
+        "checkerKind": {
+          "$ref": "#/definitions/proxycheckerCheckKind"
+        },
+        "status": {
+          "$ref": "#/definitions/proxycheckerTaskStatus"
+        },
+        "error": {
+          "$ref": "#/definitions/TaskResultError"
+        },
+        "geo": {
+          "$ref": "#/definitions/TaskResultGEO"
+        },
+        "latency": {
+          "$ref": "#/definitions/TaskResultLatency"
+        }
+      }
+    },
+    "proxycheckerTaskStatus": {
+      "type": "string",
+      "enum": [
+        "STATUS_UNKNOWN",
+        "STATUS_PENDING",
+        "STATUS_SUCCESS",
+        "STATUS_FAILURE"
+      ],
+      "default": "STATUS_UNKNOWN"
     }
   }
 }

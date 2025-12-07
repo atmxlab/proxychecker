@@ -5,6 +5,7 @@ option go_package = "github.com/atmxlab/proxychecker/gen/proto/proxychecker";
 
 service Proxychecker {
   rpc Check(CheckRequest) returns (CheckResponse) {}
+  rpc CheckResult(CheckResultRequest) returns (CheckResultResponse) {}
 }
 
 enum CheckKind {
@@ -20,4 +21,76 @@ message CheckRequest {
 
 message CheckResponse {
   string group_id = 1;
+}
+
+message CheckResultRequest {
+  string group_id = 1;
+}
+
+message CheckResultResponse {
+  message TasksStatistic {
+    // Кол-во всех проверок
+    int64 count = 1;
+    int64 success_count = 2;
+    int64 failure_count = 3;
+    int64 pending_count = 4;
+  }
+
+  message ProxiesStatistic {
+    // Кол-во всех прокси
+    int64 count = 1;
+    int64 checked_count = 2;
+    int64 pending_count = 3;
+  }
+
+  message Statistic {
+    ProxiesStatistic proxies = 1;
+    TasksStatistic tasks = 2;
+  }
+
+  message Proxy {
+    string id = 1;
+    string url = 2;
+    bool is_checked = 3;
+    TasksStatistic tasks_statistic = 4;
+    repeated Task tasks = 5;
+  }
+
+  Statistic statistic = 1;
+  repeated Proxy proxies = 2;
+  bool is_checked = 3;
+}
+
+message Task {
+  enum Status {
+    STATUS_UNKNOWN = 0;
+    STATUS_PENDING = 1;
+    STATUS_SUCCESS = 2;
+    STATUS_FAILURE = 3;
+  }
+
+  message ResultGEO {
+    string country_code = 1;
+    string region = 2;
+    string city = 3;
+    string timezone = 4;
+  }
+
+  message ResultLatency {
+    int64 from_host_to_proxy_round_trip = 1;
+    int64 from_host_to_target_round_trip = 2;
+    int64 from_proxy_to_target_round_trip = 3;
+  }
+
+  message ResultError {
+    string message = 1;
+  }
+
+  CheckKind checker_kind = 1;
+  Status status = 2;
+  oneof result {
+    ResultError error = 3;
+    ResultGEO geo = 4;
+    ResultLatency latency = 5;
+  }
 }
