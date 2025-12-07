@@ -71,7 +71,7 @@
     "proxycheckerCheckRequest": {
       "type": "object",
       "properties": {
-        "checkKinds": {
+        "kinds": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/proxycheckerCheckKind"

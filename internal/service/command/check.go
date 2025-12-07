@@ -15,6 +15,7 @@ import (
 	"github.com/atmxlab/proxychecker/internal/service/task/payload"
 	"github.com/atmxlab/proxychecker/pkg/errors"
 	"github.com/atmxlab/proxychecker/pkg/validator"
+	"github.com/samber/lo"
 )
 
 type CheckInput struct {
@@ -32,6 +33,11 @@ func (i CheckInput) Validate() error {
 	if len(i.Checkers) == 0 {
 		v.Failed("empty checkers")
 	}
+
+	if lo.Contains(i.Checkers, checker.KindUnknown) {
+		v.Failed("unknown checker")
+	}
+
 	if i.OperationTime.IsZero() || i.OperationTime.Unix() <= 0 {
 		v.Failed("invalid operation time")
 	}

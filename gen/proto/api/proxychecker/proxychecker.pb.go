@@ -72,7 +72,7 @@ func (CheckKind) EnumDescriptor() ([]byte, []int) {
 
 type CheckRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CheckKinds    []CheckKind            `protobuf:"varint,1,rep,packed,name=check_kinds,json=checkKinds,proto3,enum=proxychecker.CheckKind" json:"check_kinds,omitempty"`
+	Kinds         []CheckKind            `protobuf:"varint,1,rep,packed,name=kinds,proto3,enum=proxychecker.CheckKind" json:"kinds,omitempty"`
 	Proxies       []string               `protobuf:"bytes,2,rep,name=proxies,proto3" json:"proxies,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -108,9 +108,9 @@ func (*CheckRequest) Descriptor() ([]byte, []int) {
 	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CheckRequest) GetCheckKinds() []CheckKind {
+func (x *CheckRequest) GetKinds() []CheckKind {
 	if x != nil {
-		return x.CheckKinds
+		return x.Kinds
 	}
 	return nil
 }
@@ -170,10 +170,9 @@ var File_api_proxychecker_proxychecker_proto protoreflect.FileDescriptor
 
 const file_api_proxychecker_proxychecker_proto_rawDesc = "" +
 	"\n" +
-	"#api/proxychecker/proxychecker.proto\x12\fproxychecker\"b\n" +
-	"\fCheckRequest\x128\n" +
-	"\vcheck_kinds\x18\x01 \x03(\x0e2\x17.proxychecker.CheckKindR\n" +
-	"checkKinds\x12\x18\n" +
+	"#api/proxychecker/proxychecker.proto\x12\fproxychecker\"W\n" +
+	"\fCheckRequest\x12-\n" +
+	"\x05kinds\x18\x01 \x03(\x0e2\x17.proxychecker.CheckKindR\x05kinds\x12\x18\n" +
 	"\aproxies\x18\x02 \x03(\tR\aproxies\"*\n" +
 	"\rCheckResponse\x12\x19\n" +
 	"\bgroup_id\x18\x01 \x01(\tR\agroupId*O\n" +
@@ -204,7 +203,7 @@ var file_api_proxychecker_proxychecker_proto_goTypes = []any{
 	(*CheckResponse)(nil), // 2: proxychecker.CheckResponse
 }
 var file_api_proxychecker_proxychecker_proto_depIdxs = []int32{
-	0, // 0: proxychecker.CheckRequest.check_kinds:type_name -> proxychecker.CheckKind
+	0, // 0: proxychecker.CheckRequest.kinds:type_name -> proxychecker.CheckKind
 	1, // 1: proxychecker.Proxychecker.Check:input_type -> proxychecker.CheckRequest
 	2, // 2: proxychecker.Proxychecker.Check:output_type -> proxychecker.CheckResponse
 	2, // [2:3] is the sub-list for method output_type

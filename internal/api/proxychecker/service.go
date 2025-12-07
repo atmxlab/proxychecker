@@ -7,10 +7,10 @@ import (
 
 type Service struct {
 	desc.UnimplementedProxycheckerServer
-	c app.Commands
+	c *app.Container
 }
 
-func New(c app.Commands) *Service {
+func New(c *app.Container) *Service {
 	return &Service{
 		c: c,
 	}

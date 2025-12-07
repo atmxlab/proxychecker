@@ -14,7 +14,7 @@ enum CheckKind {
 }
 
 message CheckRequest {
-  repeated CheckKind check_kinds = 1;
+  repeated CheckKind kinds = 1;
   repeated string proxies = 2;
 }
 

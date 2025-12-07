@@ -25,7 +25,7 @@ func main() {
 
 	baseApp := app.NewApp(app.SetupContainerBuilder(appCfg).Build())
 
-	a := NewApp(baseApp, proxychecker.New(baseApp.Container().Commands()))
+	a := NewApp(baseApp, proxychecker.New(baseApp.Container()))
 
 	a.Init()
 
