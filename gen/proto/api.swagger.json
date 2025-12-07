@@ -1,0 +1,116 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/proxychecker/proxychecker.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Proxychecker"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/proxychecker.Proxychecker/Check": {
+      "post": {
+        "operationId": "Proxychecker_Check",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/proxycheckerCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/proxycheckerCheckRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Proxychecker"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "proxycheckerCheckKind": {
+      "type": "string",
+      "enum": [
+        "CHECK_KIND_UNKNOWN",
+        "CHECK_KIND_GEO",
+        "CHECK_KIND_LATENCY"
+      ],
+      "default": "CHECK_KIND_UNKNOWN"
+    },
+    "proxycheckerCheckRequest": {
+      "type": "object",
+      "properties": {
+        "checkKinds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/proxycheckerCheckKind"
+          }
+        },
+        "proxies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "proxycheckerCheckResponse": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

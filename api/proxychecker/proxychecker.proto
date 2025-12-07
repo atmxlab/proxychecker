@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package proxychecker;
+option go_package = "github.com/atmxlab/proxychecker/gen/proto/proxychecker";
+
+service Proxychecker {
+  rpc Check(CheckRequest) returns (CheckResponse) {}
+}
+
+enum CheckKind {
+  CHECK_KIND_UNKNOWN = 0;
+  CHECK_KIND_GEO = 1;
+  CHECK_KIND_LATENCY = 2;
+}
+
+message CheckRequest {
+  repeated CheckKind check_kinds = 1;
+  repeated string proxies = 2;
+}
+
+message CheckResponse {
+  string group_id = 1;
+}

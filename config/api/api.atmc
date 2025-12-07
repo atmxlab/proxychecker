@@ -1,0 +1,24 @@
+common ./../common/common.atmc
+
+{
+    common...
+
+    api: {
+        grpc: {
+            port: 50051
+        }
+        http: {
+            port: 8080
+            swagger: {
+                ui: {
+                    url: "/docs/"
+                    sourcePath: "./static/swagger"
+                }
+                json: {
+                    url: "/swagger/"
+                    path: "gen/proto/api.swagger.json"
+                }
+            }
+        }
+    }
+}
