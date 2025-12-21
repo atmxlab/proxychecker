@@ -52,8 +52,8 @@ func main() {
 	cmd := command.CheckInput{
 		OperationTime: a.Container().Entities().TimeProvider().CurrentTime(ctx),
 		Proxies:       consoleCfg.Proxies,
-		Checkers: lo.Map(consoleCfg.Checkers, func(kind string, _ int) checker.Kind {
-			return checker.KindFromString(kind)
+		Checkers: lo.Map(consoleCfg.Checkers, func(kind string, _ int) checker.KindWithPayload {
+			return checker.NewKindWithPayload(task.NewEmptyPayload(), checker.KindFromString(kind))
 		}),
 	}
 

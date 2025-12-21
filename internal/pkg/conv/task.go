@@ -8,9 +8,11 @@ import (
 
 func FromCheckerKind(kind checker.Kind) desc.CheckKind {
 	m := map[checker.Kind]desc.CheckKind{
-		checker.KindUnknown: desc.CheckKind_CHECK_KIND_UNKNOWN,
-		checker.KindGEO:     desc.CheckKind_CHECK_KIND_GEO,
-		checker.KindLatency: desc.CheckKind_CHECK_KIND_LATENCY,
+		checker.KindUnknown:    desc.CheckKind_CHECK_KIND_UNKNOWN,
+		checker.KindGEO:        desc.CheckKind_CHECK_KIND_GEO,
+		checker.KindLatency:    desc.CheckKind_CHECK_KIND_LATENCY,
+		checker.KindExternalIP: desc.CheckKind_CHECK_KIND_EXTERNAL_IP,
+		checker.KindURL:        desc.CheckKind_CHECK_KIND_URL,
 	}
 
 	return m[kind]

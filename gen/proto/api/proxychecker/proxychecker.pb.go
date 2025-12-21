@@ -24,9 +24,11 @@ const (
 type CheckKind int32
 
 const (
-	CheckKind_CHECK_KIND_UNKNOWN CheckKind = 0
-	CheckKind_CHECK_KIND_GEO     CheckKind = 1
-	CheckKind_CHECK_KIND_LATENCY CheckKind = 2
+	CheckKind_CHECK_KIND_UNKNOWN     CheckKind = 0
+	CheckKind_CHECK_KIND_GEO         CheckKind = 1
+	CheckKind_CHECK_KIND_LATENCY     CheckKind = 2
+	CheckKind_CHECK_KIND_URL         CheckKind = 3
+	CheckKind_CHECK_KIND_EXTERNAL_IP CheckKind = 4
 )
 
 // Enum value maps for CheckKind.
@@ -35,11 +37,15 @@ var (
 		0: "CHECK_KIND_UNKNOWN",
 		1: "CHECK_KIND_GEO",
 		2: "CHECK_KIND_LATENCY",
+		3: "CHECK_KIND_URL",
+		4: "CHECK_KIND_EXTERNAL_IP",
 	}
 	CheckKind_value = map[string]int32{
-		"CHECK_KIND_UNKNOWN": 0,
-		"CHECK_KIND_GEO":     1,
-		"CHECK_KIND_LATENCY": 2,
+		"CHECK_KIND_UNKNOWN":     0,
+		"CHECK_KIND_GEO":         1,
+		"CHECK_KIND_LATENCY":     2,
+		"CHECK_KIND_URL":         3,
+		"CHECK_KIND_EXTERNAL_IP": 4,
 	}
 )
 
@@ -124,7 +130,7 @@ func (Task_Status) EnumDescriptor() ([]byte, []int) {
 
 type CheckRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Kinds         []CheckKind            `protobuf:"varint,1,rep,packed,name=kinds,proto3,enum=proxychecker.CheckKind" json:"kinds,omitempty"`
+	Kinds         []*CheckRequest_Kind   `protobuf:"bytes,1,rep,name=kinds,proto3" json:"kinds,omitempty"`
 	Proxies       []string               `protobuf:"bytes,2,rep,name=proxies,proto3" json:"proxies,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -160,7 +166,7 @@ func (*CheckRequest) Descriptor() ([]byte, []int) {
 	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CheckRequest) GetKinds() []CheckKind {
+func (x *CheckRequest) GetKinds() []*CheckRequest_Kind {
 	if x != nil {
 		return x.Kinds
 	}
@@ -331,6 +337,8 @@ type Task struct {
 	//	*Task_Error
 	//	*Task_Geo
 	//	*Task_Latency
+	//	*Task_ExternalIp
+	//	*Task_Url
 	Result        isTask_Result `protobuf_oneof:"result"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -414,6 +422,24 @@ func (x *Task) GetLatency() *Task_ResultLatency {
 	return nil
 }
 
+func (x *Task) GetExternalIp() *Task_ResultExternalIP {
+	if x != nil {
+		if x, ok := x.Result.(*Task_ExternalIp); ok {
+			return x.ExternalIp
+		}
+	}
+	return nil
+}
+
+func (x *Task) GetUrl() *Task_ResultURL {
+	if x != nil {
+		if x, ok := x.Result.(*Task_Url); ok {
+			return x.Url
+		}
+	}
+	return nil
+}
+
 type isTask_Result interface {
 	isTask_Result()
 }
@@ -430,11 +456,289 @@ type Task_Latency struct {
 	Latency *Task_ResultLatency `protobuf:"bytes,5,opt,name=latency,proto3,oneof"`
 }
 
+type Task_ExternalIp struct {
+	ExternalIp *Task_ResultExternalIP `protobuf:"bytes,6,opt,name=external_ip,json=externalIp,proto3,oneof"`
+}
+
+type Task_Url struct {
+	Url *Task_ResultURL `protobuf:"bytes,7,opt,name=url,proto3,oneof"`
+}
+
 func (*Task_Error) isTask_Result() {}
 
 func (*Task_Geo) isTask_Result() {}
 
 func (*Task_Latency) isTask_Result() {}
+
+func (*Task_ExternalIp) isTask_Result() {}
+
+func (*Task_Url) isTask_Result() {}
+
+type CheckRequest_Kind struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Kind:
+	//
+	//	*CheckRequest_Kind_Geo_
+	//	*CheckRequest_Kind_Latency_
+	//	*CheckRequest_Kind_Url_
+	//	*CheckRequest_Kind_ExternalIp_
+	Kind          isCheckRequest_Kind_Kind `protobuf_oneof:"kind"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckRequest_Kind) Reset() {
+	*x = CheckRequest_Kind{}
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckRequest_Kind) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckRequest_Kind) ProtoMessage() {}
+
+func (x *CheckRequest_Kind) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckRequest_Kind.ProtoReflect.Descriptor instead.
+func (*CheckRequest_Kind) Descriptor() ([]byte, []int) {
+	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{0, 0}
+}
+
+func (x *CheckRequest_Kind) GetKind() isCheckRequest_Kind_Kind {
+	if x != nil {
+		return x.Kind
+	}
+	return nil
+}
+
+func (x *CheckRequest_Kind) GetGeo() *CheckRequest_Kind_Geo {
+	if x != nil {
+		if x, ok := x.Kind.(*CheckRequest_Kind_Geo_); ok {
+			return x.Geo
+		}
+	}
+	return nil
+}
+
+func (x *CheckRequest_Kind) GetLatency() *CheckRequest_Kind_Latency {
+	if x != nil {
+		if x, ok := x.Kind.(*CheckRequest_Kind_Latency_); ok {
+			return x.Latency
+		}
+	}
+	return nil
+}
+
+func (x *CheckRequest_Kind) GetUrl() *CheckRequest_Kind_Url {
+	if x != nil {
+		if x, ok := x.Kind.(*CheckRequest_Kind_Url_); ok {
+			return x.Url
+		}
+	}
+	return nil
+}
+
+func (x *CheckRequest_Kind) GetExternalIp() *CheckRequest_Kind_ExternalIp {
+	if x != nil {
+		if x, ok := x.Kind.(*CheckRequest_Kind_ExternalIp_); ok {
+			return x.ExternalIp
+		}
+	}
+	return nil
+}
+
+type isCheckRequest_Kind_Kind interface {
+	isCheckRequest_Kind_Kind()
+}
+
+type CheckRequest_Kind_Geo_ struct {
+	Geo *CheckRequest_Kind_Geo `protobuf:"bytes,1,opt,name=geo,proto3,oneof"`
+}
+
+type CheckRequest_Kind_Latency_ struct {
+	Latency *CheckRequest_Kind_Latency `protobuf:"bytes,2,opt,name=latency,proto3,oneof"`
+}
+
+type CheckRequest_Kind_Url_ struct {
+	Url *CheckRequest_Kind_Url `protobuf:"bytes,3,opt,name=url,proto3,oneof"`
+}
+
+type CheckRequest_Kind_ExternalIp_ struct {
+	ExternalIp *CheckRequest_Kind_ExternalIp `protobuf:"bytes,4,opt,name=external_ip,json=externalIp,proto3,oneof"`
+}
+
+func (*CheckRequest_Kind_Geo_) isCheckRequest_Kind_Kind() {}
+
+func (*CheckRequest_Kind_Latency_) isCheckRequest_Kind_Kind() {}
+
+func (*CheckRequest_Kind_Url_) isCheckRequest_Kind_Kind() {}
+
+func (*CheckRequest_Kind_ExternalIp_) isCheckRequest_Kind_Kind() {}
+
+type CheckRequest_Kind_Geo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckRequest_Kind_Geo) Reset() {
+	*x = CheckRequest_Kind_Geo{}
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckRequest_Kind_Geo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckRequest_Kind_Geo) ProtoMessage() {}
+
+func (x *CheckRequest_Kind_Geo) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckRequest_Kind_Geo.ProtoReflect.Descriptor instead.
+func (*CheckRequest_Kind_Geo) Descriptor() ([]byte, []int) {
+	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{0, 0, 0}
+}
+
+type CheckRequest_Kind_Latency struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckRequest_Kind_Latency) Reset() {
+	*x = CheckRequest_Kind_Latency{}
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckRequest_Kind_Latency) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckRequest_Kind_Latency) ProtoMessage() {}
+
+func (x *CheckRequest_Kind_Latency) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckRequest_Kind_Latency.ProtoReflect.Descriptor instead.
+func (*CheckRequest_Kind_Latency) Descriptor() ([]byte, []int) {
+	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{0, 0, 1}
+}
+
+type CheckRequest_Kind_Url struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckRequest_Kind_Url) Reset() {
+	*x = CheckRequest_Kind_Url{}
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckRequest_Kind_Url) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckRequest_Kind_Url) ProtoMessage() {}
+
+func (x *CheckRequest_Kind_Url) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckRequest_Kind_Url.ProtoReflect.Descriptor instead.
+func (*CheckRequest_Kind_Url) Descriptor() ([]byte, []int) {
+	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{0, 0, 2}
+}
+
+func (x *CheckRequest_Kind_Url) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+type CheckRequest_Kind_ExternalIp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckRequest_Kind_ExternalIp) Reset() {
+	*x = CheckRequest_Kind_ExternalIp{}
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckRequest_Kind_ExternalIp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckRequest_Kind_ExternalIp) ProtoMessage() {}
+
+func (x *CheckRequest_Kind_ExternalIp) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckRequest_Kind_ExternalIp.ProtoReflect.Descriptor instead.
+func (*CheckRequest_Kind_ExternalIp) Descriptor() ([]byte, []int) {
+	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{0, 0, 3}
+}
 
 type CheckResultResponse_TasksStatistic struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -449,7 +753,7 @@ type CheckResultResponse_TasksStatistic struct {
 
 func (x *CheckResultResponse_TasksStatistic) Reset() {
 	*x = CheckResultResponse_TasksStatistic{}
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[5]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -461,7 +765,7 @@ func (x *CheckResultResponse_TasksStatistic) String() string {
 func (*CheckResultResponse_TasksStatistic) ProtoMessage() {}
 
 func (x *CheckResultResponse_TasksStatistic) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[5]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -517,7 +821,7 @@ type CheckResultResponse_ProxiesStatistic struct {
 
 func (x *CheckResultResponse_ProxiesStatistic) Reset() {
 	*x = CheckResultResponse_ProxiesStatistic{}
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[6]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -529,7 +833,7 @@ func (x *CheckResultResponse_ProxiesStatistic) String() string {
 func (*CheckResultResponse_ProxiesStatistic) ProtoMessage() {}
 
 func (x *CheckResultResponse_ProxiesStatistic) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[6]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -576,7 +880,7 @@ type CheckResultResponse_Statistic struct {
 
 func (x *CheckResultResponse_Statistic) Reset() {
 	*x = CheckResultResponse_Statistic{}
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[7]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -588,7 +892,7 @@ func (x *CheckResultResponse_Statistic) String() string {
 func (*CheckResultResponse_Statistic) ProtoMessage() {}
 
 func (x *CheckResultResponse_Statistic) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[7]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -631,7 +935,7 @@ type CheckResultResponse_Proxy struct {
 
 func (x *CheckResultResponse_Proxy) Reset() {
 	*x = CheckResultResponse_Proxy{}
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[8]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -643,7 +947,7 @@ func (x *CheckResultResponse_Proxy) String() string {
 func (*CheckResultResponse_Proxy) ProtoMessage() {}
 
 func (x *CheckResultResponse_Proxy) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[8]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -706,7 +1010,7 @@ type Task_ResultGEO struct {
 
 func (x *Task_ResultGEO) Reset() {
 	*x = Task_ResultGEO{}
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[9]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -718,7 +1022,7 @@ func (x *Task_ResultGEO) String() string {
 func (*Task_ResultGEO) ProtoMessage() {}
 
 func (x *Task_ResultGEO) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[9]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -773,7 +1077,7 @@ type Task_ResultLatency struct {
 
 func (x *Task_ResultLatency) Reset() {
 	*x = Task_ResultLatency{}
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[10]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -785,7 +1089,7 @@ func (x *Task_ResultLatency) String() string {
 func (*Task_ResultLatency) ProtoMessage() {}
 
 func (x *Task_ResultLatency) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[10]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -822,6 +1126,94 @@ func (x *Task_ResultLatency) GetFromProxyToTargetRoundTrip() int64 {
 	return 0
 }
 
+type Task_ResultExternalIP struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ip            string                 `protobuf:"bytes,1,opt,name=ip,proto3" json:"ip,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Task_ResultExternalIP) Reset() {
+	*x = Task_ResultExternalIP{}
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Task_ResultExternalIP) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Task_ResultExternalIP) ProtoMessage() {}
+
+func (x *Task_ResultExternalIP) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Task_ResultExternalIP.ProtoReflect.Descriptor instead.
+func (*Task_ResultExternalIP) Descriptor() ([]byte, []int) {
+	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{4, 2}
+}
+
+func (x *Task_ResultExternalIP) GetIp() string {
+	if x != nil {
+		return x.Ip
+	}
+	return ""
+}
+
+type Task_ResultURL struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IsAvailable   bool                   `protobuf:"varint,1,opt,name=is_available,json=isAvailable,proto3" json:"is_available,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Task_ResultURL) Reset() {
+	*x = Task_ResultURL{}
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Task_ResultURL) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Task_ResultURL) ProtoMessage() {}
+
+func (x *Task_ResultURL) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Task_ResultURL.ProtoReflect.Descriptor instead.
+func (*Task_ResultURL) Descriptor() ([]byte, []int) {
+	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{4, 3}
+}
+
+func (x *Task_ResultURL) GetIsAvailable() bool {
+	if x != nil {
+		return x.IsAvailable
+	}
+	return false
+}
+
 type Task_ResultError struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
@@ -831,7 +1223,7 @@ type Task_ResultError struct {
 
 func (x *Task_ResultError) Reset() {
 	*x = Task_ResultError{}
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[11]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -843,7 +1235,7 @@ func (x *Task_ResultError) String() string {
 func (*Task_ResultError) ProtoMessage() {}
 
 func (x *Task_ResultError) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[11]
+	mi := &file_api_proxychecker_proxychecker_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -856,7 +1248,7 @@ func (x *Task_ResultError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Task_ResultError.ProtoReflect.Descriptor instead.
 func (*Task_ResultError) Descriptor() ([]byte, []int) {
-	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{4, 2}
+	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{4, 4}
 }
 
 func (x *Task_ResultError) GetMessage() string {
@@ -870,10 +1262,23 @@ var File_api_proxychecker_proxychecker_proto protoreflect.FileDescriptor
 
 const file_api_proxychecker_proxychecker_proto_rawDesc = "" +
 	"\n" +
-	"#api/proxychecker/proxychecker.proto\x12\fproxychecker\"W\n" +
-	"\fCheckRequest\x12-\n" +
-	"\x05kinds\x18\x01 \x03(\x0e2\x17.proxychecker.CheckKindR\x05kinds\x12\x18\n" +
-	"\aproxies\x18\x02 \x03(\tR\aproxies\"*\n" +
+	"#api/proxychecker/proxychecker.proto\x12\fproxychecker\"\xaf\x03\n" +
+	"\fCheckRequest\x125\n" +
+	"\x05kinds\x18\x01 \x03(\v2\x1f.proxychecker.CheckRequest.KindR\x05kinds\x12\x18\n" +
+	"\aproxies\x18\x02 \x03(\tR\aproxies\x1a\xcd\x02\n" +
+	"\x04Kind\x127\n" +
+	"\x03geo\x18\x01 \x01(\v2#.proxychecker.CheckRequest.Kind.GeoH\x00R\x03geo\x12C\n" +
+	"\alatency\x18\x02 \x01(\v2'.proxychecker.CheckRequest.Kind.LatencyH\x00R\alatency\x127\n" +
+	"\x03url\x18\x03 \x01(\v2#.proxychecker.CheckRequest.Kind.UrlH\x00R\x03url\x12M\n" +
+	"\vexternal_ip\x18\x04 \x01(\v2*.proxychecker.CheckRequest.Kind.ExternalIpH\x00R\n" +
+	"externalIp\x1a\x05\n" +
+	"\x03Geo\x1a\t\n" +
+	"\aLatency\x1a\x17\n" +
+	"\x03Url\x12\x10\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x1a\f\n" +
+	"\n" +
+	"ExternalIpB\x06\n" +
+	"\x04kind\"*\n" +
 	"\rCheckResponse\x12\x19\n" +
 	"\bgroup_id\x18\x01 \x01(\tR\agroupId\"/\n" +
 	"\x12CheckResultRequest\x12\x19\n" +
@@ -901,13 +1306,16 @@ const file_api_proxychecker_proxychecker_proto_rawDesc = "" +
 	"\n" +
 	"is_checked\x18\x03 \x01(\bR\tisChecked\x12Y\n" +
 	"\x0ftasks_statistic\x18\x04 \x01(\v20.proxychecker.CheckResultResponse.TasksStatisticR\x0etasksStatistic\x12(\n" +
-	"\x05tasks\x18\x05 \x03(\v2\x12.proxychecker.TaskR\x05tasks\"\xfd\x05\n" +
+	"\x05tasks\x18\x05 \x03(\v2\x12.proxychecker.TaskR\x05tasks\"\xcb\a\n" +
 	"\x04Task\x12:\n" +
 	"\fchecker_kind\x18\x01 \x01(\x0e2\x17.proxychecker.CheckKindR\vcheckerKind\x121\n" +
 	"\x06status\x18\x02 \x01(\x0e2\x19.proxychecker.Task.StatusR\x06status\x126\n" +
 	"\x05error\x18\x03 \x01(\v2\x1e.proxychecker.Task.ResultErrorH\x00R\x05error\x120\n" +
 	"\x03geo\x18\x04 \x01(\v2\x1c.proxychecker.Task.ResultGEOH\x00R\x03geo\x12<\n" +
-	"\alatency\x18\x05 \x01(\v2 .proxychecker.Task.ResultLatencyH\x00R\alatency\x1av\n" +
+	"\alatency\x18\x05 \x01(\v2 .proxychecker.Task.ResultLatencyH\x00R\alatency\x12F\n" +
+	"\vexternal_ip\x18\x06 \x01(\v2#.proxychecker.Task.ResultExternalIPH\x00R\n" +
+	"externalIp\x120\n" +
+	"\x03url\x18\a \x01(\v2\x1c.proxychecker.Task.ResultURLH\x00R\x03url\x1av\n" +
 	"\tResultGEO\x12!\n" +
 	"\fcountry_code\x18\x01 \x01(\tR\vcountryCode\x12\x16\n" +
 	"\x06region\x18\x02 \x01(\tR\x06region\x12\x12\n" +
@@ -916,7 +1324,11 @@ const file_api_proxychecker_proxychecker_proto_rawDesc = "" +
 	"\rResultLatency\x12?\n" +
 	"\x1dfrom_host_to_proxy_round_trip\x18\x01 \x01(\x03R\x18fromHostToProxyRoundTrip\x12A\n" +
 	"\x1efrom_host_to_target_round_trip\x18\x02 \x01(\x03R\x19fromHostToTargetRoundTrip\x12C\n" +
-	"\x1ffrom_proxy_to_target_round_trip\x18\x03 \x01(\x03R\x1afromProxyToTargetRoundTrip\x1a'\n" +
+	"\x1ffrom_proxy_to_target_round_trip\x18\x03 \x01(\x03R\x1afromProxyToTargetRoundTrip\x1a\"\n" +
+	"\x10ResultExternalIP\x12\x0e\n" +
+	"\x02ip\x18\x01 \x01(\tR\x02ip\x1a.\n" +
+	"\tResultURL\x12!\n" +
+	"\fis_available\x18\x01 \x01(\bR\visAvailable\x1a'\n" +
 	"\vResultError\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"X\n" +
 	"\x06Status\x12\x12\n" +
@@ -924,11 +1336,13 @@ const file_api_proxychecker_proxychecker_proto_rawDesc = "" +
 	"\x0eSTATUS_PENDING\x10\x01\x12\x12\n" +
 	"\x0eSTATUS_SUCCESS\x10\x02\x12\x12\n" +
 	"\x0eSTATUS_FAILURE\x10\x03B\b\n" +
-	"\x06result*O\n" +
+	"\x06result*\x7f\n" +
 	"\tCheckKind\x12\x16\n" +
 	"\x12CHECK_KIND_UNKNOWN\x10\x00\x12\x12\n" +
 	"\x0eCHECK_KIND_GEO\x10\x01\x12\x16\n" +
-	"\x12CHECK_KIND_LATENCY\x10\x022\xa8\x01\n" +
+	"\x12CHECK_KIND_LATENCY\x10\x02\x12\x12\n" +
+	"\x0eCHECK_KIND_URL\x10\x03\x12\x1a\n" +
+	"\x16CHECK_KIND_EXTERNAL_IP\x10\x042\xa8\x01\n" +
 	"\fProxychecker\x12B\n" +
 	"\x05Check\x12\x1a.proxychecker.CheckRequest\x1a\x1b.proxychecker.CheckResponse\"\x00\x12T\n" +
 	"\vCheckResult\x12 .proxychecker.CheckResultRequest\x1a!.proxychecker.CheckResultResponse\"\x00B8Z6github.com/atmxlab/proxychecker/gen/proto/proxycheckerb\x06proto3"
@@ -946,7 +1360,7 @@ func file_api_proxychecker_proxychecker_proto_rawDescGZIP() []byte {
 }
 
 var file_api_proxychecker_proxychecker_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_api_proxychecker_proxychecker_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_api_proxychecker_proxychecker_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_api_proxychecker_proxychecker_proto_goTypes = []any{
 	(CheckKind)(0),                               // 0: proxychecker.CheckKind
 	(Task_Status)(0),                             // 1: proxychecker.Task.Status
@@ -955,36 +1369,49 @@ var file_api_proxychecker_proxychecker_proto_goTypes = []any{
 	(*CheckResultRequest)(nil),                   // 4: proxychecker.CheckResultRequest
 	(*CheckResultResponse)(nil),                  // 5: proxychecker.CheckResultResponse
 	(*Task)(nil),                                 // 6: proxychecker.Task
-	(*CheckResultResponse_TasksStatistic)(nil),   // 7: proxychecker.CheckResultResponse.TasksStatistic
-	(*CheckResultResponse_ProxiesStatistic)(nil), // 8: proxychecker.CheckResultResponse.ProxiesStatistic
-	(*CheckResultResponse_Statistic)(nil),        // 9: proxychecker.CheckResultResponse.Statistic
-	(*CheckResultResponse_Proxy)(nil),            // 10: proxychecker.CheckResultResponse.Proxy
-	(*Task_ResultGEO)(nil),                       // 11: proxychecker.Task.ResultGEO
-	(*Task_ResultLatency)(nil),                   // 12: proxychecker.Task.ResultLatency
-	(*Task_ResultError)(nil),                     // 13: proxychecker.Task.ResultError
+	(*CheckRequest_Kind)(nil),                    // 7: proxychecker.CheckRequest.Kind
+	(*CheckRequest_Kind_Geo)(nil),                // 8: proxychecker.CheckRequest.Kind.Geo
+	(*CheckRequest_Kind_Latency)(nil),            // 9: proxychecker.CheckRequest.Kind.Latency
+	(*CheckRequest_Kind_Url)(nil),                // 10: proxychecker.CheckRequest.Kind.Url
+	(*CheckRequest_Kind_ExternalIp)(nil),         // 11: proxychecker.CheckRequest.Kind.ExternalIp
+	(*CheckResultResponse_TasksStatistic)(nil),   // 12: proxychecker.CheckResultResponse.TasksStatistic
+	(*CheckResultResponse_ProxiesStatistic)(nil), // 13: proxychecker.CheckResultResponse.ProxiesStatistic
+	(*CheckResultResponse_Statistic)(nil),        // 14: proxychecker.CheckResultResponse.Statistic
+	(*CheckResultResponse_Proxy)(nil),            // 15: proxychecker.CheckResultResponse.Proxy
+	(*Task_ResultGEO)(nil),                       // 16: proxychecker.Task.ResultGEO
+	(*Task_ResultLatency)(nil),                   // 17: proxychecker.Task.ResultLatency
+	(*Task_ResultExternalIP)(nil),                // 18: proxychecker.Task.ResultExternalIP
+	(*Task_ResultURL)(nil),                       // 19: proxychecker.Task.ResultURL
+	(*Task_ResultError)(nil),                     // 20: proxychecker.Task.ResultError
 }
 var file_api_proxychecker_proxychecker_proto_depIdxs = []int32{
-	0,  // 0: proxychecker.CheckRequest.kinds:type_name -> proxychecker.CheckKind
-	9,  // 1: proxychecker.CheckResultResponse.statistic:type_name -> proxychecker.CheckResultResponse.Statistic
-	10, // 2: proxychecker.CheckResultResponse.proxies:type_name -> proxychecker.CheckResultResponse.Proxy
+	7,  // 0: proxychecker.CheckRequest.kinds:type_name -> proxychecker.CheckRequest.Kind
+	14, // 1: proxychecker.CheckResultResponse.statistic:type_name -> proxychecker.CheckResultResponse.Statistic
+	15, // 2: proxychecker.CheckResultResponse.proxies:type_name -> proxychecker.CheckResultResponse.Proxy
 	0,  // 3: proxychecker.Task.checker_kind:type_name -> proxychecker.CheckKind
 	1,  // 4: proxychecker.Task.status:type_name -> proxychecker.Task.Status
-	13, // 5: proxychecker.Task.error:type_name -> proxychecker.Task.ResultError
-	11, // 6: proxychecker.Task.geo:type_name -> proxychecker.Task.ResultGEO
-	12, // 7: proxychecker.Task.latency:type_name -> proxychecker.Task.ResultLatency
-	8,  // 8: proxychecker.CheckResultResponse.Statistic.proxies:type_name -> proxychecker.CheckResultResponse.ProxiesStatistic
-	7,  // 9: proxychecker.CheckResultResponse.Statistic.tasks:type_name -> proxychecker.CheckResultResponse.TasksStatistic
-	7,  // 10: proxychecker.CheckResultResponse.Proxy.tasks_statistic:type_name -> proxychecker.CheckResultResponse.TasksStatistic
-	6,  // 11: proxychecker.CheckResultResponse.Proxy.tasks:type_name -> proxychecker.Task
-	2,  // 12: proxychecker.Proxychecker.Check:input_type -> proxychecker.CheckRequest
-	4,  // 13: proxychecker.Proxychecker.CheckResult:input_type -> proxychecker.CheckResultRequest
-	3,  // 14: proxychecker.Proxychecker.Check:output_type -> proxychecker.CheckResponse
-	5,  // 15: proxychecker.Proxychecker.CheckResult:output_type -> proxychecker.CheckResultResponse
-	14, // [14:16] is the sub-list for method output_type
-	12, // [12:14] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	20, // 5: proxychecker.Task.error:type_name -> proxychecker.Task.ResultError
+	16, // 6: proxychecker.Task.geo:type_name -> proxychecker.Task.ResultGEO
+	17, // 7: proxychecker.Task.latency:type_name -> proxychecker.Task.ResultLatency
+	18, // 8: proxychecker.Task.external_ip:type_name -> proxychecker.Task.ResultExternalIP
+	19, // 9: proxychecker.Task.url:type_name -> proxychecker.Task.ResultURL
+	8,  // 10: proxychecker.CheckRequest.Kind.geo:type_name -> proxychecker.CheckRequest.Kind.Geo
+	9,  // 11: proxychecker.CheckRequest.Kind.latency:type_name -> proxychecker.CheckRequest.Kind.Latency
+	10, // 12: proxychecker.CheckRequest.Kind.url:type_name -> proxychecker.CheckRequest.Kind.Url
+	11, // 13: proxychecker.CheckRequest.Kind.external_ip:type_name -> proxychecker.CheckRequest.Kind.ExternalIp
+	13, // 14: proxychecker.CheckResultResponse.Statistic.proxies:type_name -> proxychecker.CheckResultResponse.ProxiesStatistic
+	12, // 15: proxychecker.CheckResultResponse.Statistic.tasks:type_name -> proxychecker.CheckResultResponse.TasksStatistic
+	12, // 16: proxychecker.CheckResultResponse.Proxy.tasks_statistic:type_name -> proxychecker.CheckResultResponse.TasksStatistic
+	6,  // 17: proxychecker.CheckResultResponse.Proxy.tasks:type_name -> proxychecker.Task
+	2,  // 18: proxychecker.Proxychecker.Check:input_type -> proxychecker.CheckRequest
+	4,  // 19: proxychecker.Proxychecker.CheckResult:input_type -> proxychecker.CheckResultRequest
+	3,  // 20: proxychecker.Proxychecker.Check:output_type -> proxychecker.CheckResponse
+	5,  // 21: proxychecker.Proxychecker.CheckResult:output_type -> proxychecker.CheckResultResponse
+	20, // [20:22] is the sub-list for method output_type
+	18, // [18:20] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_api_proxychecker_proxychecker_proto_init() }
@@ -996,6 +1423,14 @@ func file_api_proxychecker_proxychecker_proto_init() {
 		(*Task_Error)(nil),
 		(*Task_Geo)(nil),
 		(*Task_Latency)(nil),
+		(*Task_ExternalIp)(nil),
+		(*Task_Url)(nil),
+	}
+	file_api_proxychecker_proxychecker_proto_msgTypes[5].OneofWrappers = []any{
+		(*CheckRequest_Kind_Geo_)(nil),
+		(*CheckRequest_Kind_Latency_)(nil),
+		(*CheckRequest_Kind_Url_)(nil),
+		(*CheckRequest_Kind_ExternalIp_)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1003,7 +1438,7 @@ func file_api_proxychecker_proxychecker_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_proxychecker_proxychecker_proto_rawDesc), len(file_api_proxychecker_proxychecker_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   12,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -30,15 +30,19 @@ func NewApp(t *testing.T) *App {
 	}
 	ctrl := gomock.NewController(t)
 	mocks := Mocks{
-		geoChecker:     handlermocks.NewMockChecker(ctrl),
-		latencyChecker: handlermocks.NewMockChecker(ctrl),
+		geoChecker:        handlermocks.NewMockChecker(ctrl),
+		latencyChecker:    handlermocks.NewMockChecker(ctrl),
+		externalIPChecker: handlermocks.NewMockChecker(ctrl),
+		urlChecker:        handlermocks.NewMockChecker(ctrl),
 	}
 
 	cb := app.SetupContainerBuilder(cfg)
 	cb.WithCheckers(func(cb *app.CheckersBuilder) {
 		cb.
 			GEO(mocks.geoChecker).
-			Latency(mocks.latencyChecker)
+			Latency(mocks.latencyChecker).
+			URL(mocks.urlChecker).
+			ExternalIP(mocks.externalIPChecker)
 	})
 	a := app.NewApp(cb.Build())
 
@@ -77,8 +81,10 @@ func (a *App) Mocks() Mocks {
 }
 
 type Mocks struct {
-	geoChecker     *handlermocks.MockChecker
-	latencyChecker *handlermocks.MockChecker
+	geoChecker        *handlermocks.MockChecker
+	latencyChecker    *handlermocks.MockChecker
+	externalIPChecker *handlermocks.MockChecker
+	urlChecker        *handlermocks.MockChecker
 }
 
 func (m Mocks) GeoChecker() *handlermocks.MockChecker {
@@ -87,6 +93,14 @@ func (m Mocks) GeoChecker() *handlermocks.MockChecker {
 
 func (m Mocks) LatencyChecker() *handlermocks.MockChecker {
 	return m.latencyChecker
+}
+
+func (m Mocks) ExternalIPChecker() *handlermocks.MockChecker {
+	return m.externalIPChecker
+}
+
+func (m Mocks) URLChecker() *handlermocks.MockChecker {
+	return m.urlChecker
 }
 
 func (a *App) WaitTasksTerminated() {

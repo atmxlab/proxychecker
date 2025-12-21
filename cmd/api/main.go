@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -23,6 +24,8 @@ func main() {
 		panic(err)
 	}
 
+	setupLogger(appCfg.Logger.Level)
+
 	baseApp := app.NewApp(app.SetupContainerBuilder(appCfg).Build())
 
 	a := NewApp(baseApp, proxychecker.New(baseApp.Container()))
@@ -43,4 +46,19 @@ func main() {
 		logrus.Errorf("app.Stop error: %s", err)
 	}
 	wg.Wait()
+}
+
+func setupLogger(level string) {
+	m := map[string]logrus.Level{
+		"debug": logrus.DebugLevel,
+		"info":  logrus.InfoLevel,
+		"warn":  logrus.WarnLevel,
+		"error": logrus.ErrorLevel,
+	}
+	if ll, ok := m[level]; ok {
+		logrus.SetLevel(ll)
+		logrus.Infof("Setup logger: level: [%s]", level)
+	} else {
+		panic(fmt.Errorf("invalid log level: %s", level))
+	}
 }

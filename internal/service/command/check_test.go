@@ -33,9 +33,9 @@ func TestCheck(t *testing.T) {
 			"https://proxy-4.io",
 			"https://proxy-5.io",
 		},
-		Checkers: []checker.Kind{
-			checker.KindGEO,
-			checker.KindLatency,
+		Checkers: []checker.KindWithPayload{
+			checker.NewKindWithPayload(task.NewEmptyPayload(), checker.KindGEO),
+			checker.NewKindWithPayload(task.NewEmptyPayload(), checker.KindLatency),
 		},
 	}
 

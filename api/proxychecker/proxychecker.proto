@@ -12,10 +12,28 @@ enum CheckKind {
   CHECK_KIND_UNKNOWN = 0;
   CHECK_KIND_GEO = 1;
   CHECK_KIND_LATENCY = 2;
+  CHECK_KIND_URL = 3;
+  CHECK_KIND_EXTERNAL_IP = 4;
 }
 
 message CheckRequest {
-  repeated CheckKind kinds = 1;
+  message Kind {
+    message Geo {}
+    message Latency {}
+    message Url {
+      string url = 1;
+    }
+    message ExternalIp {}
+
+    oneof kind {
+      Geo geo = 1;
+      Latency latency = 2;
+      Url url = 3;
+      ExternalIp external_ip = 4;
+    }
+  }
+
+  repeated Kind kinds = 1;
   repeated string proxies = 2;
 }
 
@@ -82,6 +100,14 @@ message Task {
     int64 from_proxy_to_target_round_trip = 3;
   }
 
+  message ResultExternalIP {
+    string ip = 1;
+  }
+
+  message ResultURL {
+    bool is_available = 1;
+  }
+
   message ResultError {
     string message = 1;
   }
@@ -92,5 +118,7 @@ message Task {
     ResultError error = 3;
     ResultGEO geo = 4;
     ResultLatency latency = 5;
+    ResultExternalIP external_ip = 6;
+    ResultURL url = 7;
   }
 }

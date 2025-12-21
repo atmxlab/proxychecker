@@ -9,16 +9,16 @@ import (
 	"github.com/atmxlab/proxychecker/pkg/errors"
 )
 
-type GeoChecker struct {
+type ExternalIPChecker struct {
 	clientFactory ClientFactory
 	ipApiFactory  IPApiFactory
 }
 
-func NewGeoChecker(clientFactory ClientFactory, ipApiFactory IPApiFactory) *GeoChecker {
-	return &GeoChecker{clientFactory: clientFactory, ipApiFactory: ipApiFactory}
+func NewExternalIPChecker(clientFactory ClientFactory, ipApiFactory IPApiFactory) *ExternalIPChecker {
+	return &ExternalIPChecker{clientFactory: clientFactory, ipApiFactory: ipApiFactory}
 }
 
-func (c *GeoChecker) Run(ctx context.Context, agg *aggregate.Task) (task.Result, error) {
+func (c *ExternalIPChecker) Run(ctx context.Context, agg *aggregate.Task) (task.Result, error) {
 	cl := c.clientFactory.Create(client.WithProxyURL(agg.Proxy().URL()))
 	ipApi := c.ipApiFactory.Create(cl)
 
@@ -32,14 +32,8 @@ func (c *GeoChecker) Run(ctx context.Context, agg *aggregate.Task) (task.Result,
 	}
 
 	return task.Result{
-		GEOResult: &task.GEOResult{
-			ContinentCode: output.ContinentCode,
-			Continent:     output.Continent,
-			CountryCode:   output.CountryCode,
-			Country:       output.Country,
-			Region:        output.Country,
-			City:          output.City,
-			Timezone:      output.Timezone,
+		ExternalIPResult: &task.ExternalIPResult{
+			IP: output.Query,
 		},
 	}, nil
 }

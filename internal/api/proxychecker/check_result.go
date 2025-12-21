@@ -96,5 +96,21 @@ func mapTask(tk *entity.Task) *desc.Task {
 		}
 	}
 
+	if res := tk.State().Result().ExternalIPResult; res != nil {
+		pbtk.Result = &desc.Task_ExternalIp{
+			ExternalIp: &desc.Task_ResultExternalIP{
+				Ip: res.IP,
+			},
+		}
+	}
+
+	if res := tk.State().Result().URLResult; res != nil {
+		pbtk.Result = &desc.Task_Url{
+			Url: &desc.Task_ResultURL{
+				IsAvailable: res.IsAvailable,
+			},
+		}
+	}
+
 	return pbtk
 }

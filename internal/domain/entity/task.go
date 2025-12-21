@@ -53,6 +53,10 @@ func (t *Task) TargetURL() (task.TargetURL, bool) {
 	return task.TargetURL{}, false
 }
 
+func (t *Task) Payload() task.Payload {
+	return t.payload
+}
+
 func (t *Task) CreatedAt() time.Time {
 	return t.createdAt
 }

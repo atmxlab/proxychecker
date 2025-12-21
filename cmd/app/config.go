@@ -1,8 +1,13 @@
 package app
 
 type Config struct {
-	Queue Queue `atmc:"queue"`
-	API   API   `atmc:"api"`
+	Queue  Queue  `atmc:"queue"`
+	API    API    `atmc:"api"`
+	Logger Logger `atmc:"logger"`
+}
+
+type Logger struct {
+	Level string `atmc:"level"`
 }
 
 type Queue struct {

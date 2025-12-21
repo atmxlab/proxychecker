@@ -57,6 +57,11 @@ func (b *TaskBuilder) TargetURL(targetURL task.TargetURL) *TaskBuilder {
 	return b
 }
 
+func (b *TaskBuilder) Payload(payload task.Payload) *TaskBuilder {
+	b.payload = payload
+	return b
+}
+
 func (b *TaskBuilder) Build() *Task {
 	return &Task{
 		id:          b.id,
@@ -65,6 +70,7 @@ func (b *TaskBuilder) Build() *Task {
 		checkerKind: b.checkerKind,
 		status:      task.StatusPending,
 		state:       task.State{},
+		payload:     b.payload,
 		createdAt:   b.createdAt,
 		updatedAt:   b.updatedAt,
 	}

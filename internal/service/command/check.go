@@ -15,13 +15,12 @@ import (
 	"github.com/atmxlab/proxychecker/internal/service/task/payload"
 	"github.com/atmxlab/proxychecker/pkg/errors"
 	"github.com/atmxlab/proxychecker/pkg/validator"
-	"github.com/samber/lo"
 )
 
 type CheckInput struct {
 	OperationTime time.Time
 	Proxies       []string
-	Checkers      []checker.Kind
+	Checkers      []checker.KindWithPayload
 }
 
 func (i CheckInput) Validate() error {
@@ -34,8 +33,8 @@ func (i CheckInput) Validate() error {
 		v.Failed("empty checkers")
 	}
 
-	if lo.Contains(i.Checkers, checker.KindUnknown) {
-		v.Failed("unknown checker")
+	for _, ch := range i.Checkers {
+		v.AddErr(ch.Validate())
 	}
 
 	if i.OperationTime.IsZero() || i.OperationTime.Unix() <= 0 {
@@ -137,7 +136,7 @@ func (c *CheckCommand) makeProxies(proxyUrls []string, ot time.Time) ([]*entity.
 
 func (c *CheckCommand) makeTasks(
 	proxies []*entity.Proxy,
-	checkerKinds []checker.Kind,
+	checkerKinds []checker.KindWithPayload,
 	ot time.Time,
 ) ([]*entity.Task, task.GroupID) {
 	tasks := make([]*entity.Task, 0, len(proxies)*len(checkerKinds))
@@ -192,16 +191,17 @@ func (c *CheckCommand) buildTask(
 	operationTime time.Time,
 	groupID task.GroupID,
 	proxyID proxy.ID,
-	checkerKind checker.Kind,
+	checkerKind checker.KindWithPayload,
 ) *entity.Task {
 	t := entity.
 		NewTaskBuilder().
 		ID(task.NewID()).
 		GroupID(groupID).
 		ProxyID(proxyID).
-		CheckerKind(checkerKind).
+		CheckerKind(checkerKind.Kind()).
 		CreatedAt(operationTime).
 		UpdatedAt(operationTime).
+		Payload(checkerKind.Payload()).
 		Build()
 
 	return t

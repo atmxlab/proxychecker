@@ -21,4 +21,6 @@ func (a *App) initQueue() {
 
 	addHandler(stask.KindCheckLatency, a.Container().Checkers().Latency())
 	addHandler(stask.KindCheckGEO, a.Container().Checkers().GEO())
+	addHandler(stask.KindCheckExternalIP, a.Container().Checkers().ExternalIP())
+	addHandler(stask.KindCheckURL, a.Container().Checkers().URL())
 }

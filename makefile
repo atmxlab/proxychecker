@@ -12,6 +12,7 @@ mockgen\:install:
 
 generate:
 	go generate ./...
+	make proto:gen
 
 .PHONY: proto clean install-plugins
 

@@ -76,6 +76,13 @@ func SetupContainerBuilder(cfg Config) *ContainerBuilder {
 					cb.Container().Entities().ClientFactory(),
 					cb.Container().Entities().IpApiFactory(),
 					cb.Container().Entities().TimeProvider(),
+				)).
+				ExternalIP(checker.NewExternalIPChecker(
+					cb.Container().Entities().ClientFactory(),
+					cb.Container().Entities().IpApiFactory(),
+				)).
+				URL(checker.NewURLChecker(
+					cb.Container().Entities().ClientFactory(),
 				))
 		}).
 		WithCommands(func(pb *CommandsBuilder) {

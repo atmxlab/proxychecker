@@ -6,9 +6,11 @@ import (
 )
 
 type Result struct {
-	ErrorResult   *ErrorResult   `json:"errorResult,omitempty"`
-	LatencyResult *LatencyResult `json:"latencyResult,omitempty"`
-	GEOResult     *GEOResult     `json:"geoResult,omitempty"`
+	ErrorResult      *ErrorResult      `json:"errorResult,omitempty"`
+	LatencyResult    *LatencyResult    `json:"latencyResult,omitempty"`
+	GEOResult        *GEOResult        `json:"geoResult,omitempty"`
+	ExternalIPResult *ExternalIPResult `json:"externalIPResult,omitempty"`
+	URLResult        *URLResult        `json:"urlResult,omitempty"`
 }
 
 func (r Result) String() string {
@@ -20,6 +22,12 @@ func (r Result) String() string {
 	}
 	if r.ErrorResult != nil {
 		return r.ErrorResult.String()
+	}
+	if r.ExternalIPResult != nil {
+		return r.ExternalIPResult.String()
+	}
+	if r.URLResult != nil {
+		return r.URLResult.String()
 	}
 
 	return ""
@@ -58,4 +66,24 @@ func (r *GEOResult) String() string {
 		r.City,
 		r.Timezone,
 	)
+}
+
+type ExternalIPResult struct {
+	IP string
+}
+
+func (r *ExternalIPResult) String() string {
+	return fmt.Sprintf("external IP: [%s]", r.IP)
+}
+
+type URLResult struct {
+	IsAvailable bool
+}
+
+func (r *URLResult) String() string {
+	if r.IsAvailable {
+		return fmt.Sprintf("url is available")
+	}
+
+	return fmt.Sprintf("url is not available")
 }

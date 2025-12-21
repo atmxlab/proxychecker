@@ -1,5 +1,7 @@
 queue ./queue.atmc
+logger ./logger.atmc
 
 {
     queue: queue
+    logger: logger
 }

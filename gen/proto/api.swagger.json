@@ -82,6 +82,23 @@
     }
   },
   "definitions": {
+    "CheckRequestKind": {
+      "type": "object",
+      "properties": {
+        "geo": {
+          "$ref": "#/definitions/KindGeo"
+        },
+        "latency": {
+          "$ref": "#/definitions/KindLatency"
+        },
+        "url": {
+          "$ref": "#/definitions/KindUrl"
+        },
+        "externalIp": {
+          "$ref": "#/definitions/KindExternalIp"
+        }
+      }
+    },
     "CheckResultResponseProxiesStatistic": {
       "type": "object",
       "properties": {
@@ -157,10 +174,35 @@
         }
       }
     },
+    "KindExternalIp": {
+      "type": "object"
+    },
+    "KindGeo": {
+      "type": "object"
+    },
+    "KindLatency": {
+      "type": "object"
+    },
+    "KindUrl": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      }
+    },
     "TaskResultError": {
       "type": "object",
       "properties": {
         "message": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskResultExternalIP": {
+      "type": "object",
+      "properties": {
+        "ip": {
           "type": "string"
         }
       }
@@ -199,6 +241,14 @@
         }
       }
     },
+    "TaskResultURL": {
+      "type": "object",
+      "properties": {
+        "isAvailable": {
+          "type": "boolean"
+        }
+      }
+    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -232,7 +282,9 @@
       "enum": [
         "CHECK_KIND_UNKNOWN",
         "CHECK_KIND_GEO",
-        "CHECK_KIND_LATENCY"
+        "CHECK_KIND_LATENCY",
+        "CHECK_KIND_URL",
+        "CHECK_KIND_EXTERNAL_IP"
       ],
       "default": "CHECK_KIND_UNKNOWN"
     },
@@ -242,7 +294,8 @@
         "kinds": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/proxycheckerCheckKind"
+            "type": "object",
+            "$ref": "#/definitions/CheckRequestKind"
           }
         },
         "proxies": {
@@ -304,6 +357,12 @@
         },
         "latency": {
           "$ref": "#/definitions/TaskResultLatency"
+        },
+        "externalIp": {
+          "$ref": "#/definitions/TaskResultExternalIP"
+        },
+        "url": {
+          "$ref": "#/definitions/TaskResultURL"
         }
       }
     },
