@@ -1172,7 +1172,9 @@ func (x *Task_ResultExternalIP) GetIp() string {
 
 type Task_ResultURL struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	IsAvailable   bool                   `protobuf:"varint,1,opt,name=is_available,json=isAvailable,proto3" json:"is_available,omitempty"`
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	IsAvailable   bool                   `protobuf:"varint,2,opt,name=is_available,json=isAvailable,proto3" json:"is_available,omitempty"`
+	StatusCode    int64                  `protobuf:"varint,3,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1207,11 +1209,25 @@ func (*Task_ResultURL) Descriptor() ([]byte, []int) {
 	return file_api_proxychecker_proxychecker_proto_rawDescGZIP(), []int{4, 3}
 }
 
+func (x *Task_ResultURL) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
 func (x *Task_ResultURL) GetIsAvailable() bool {
 	if x != nil {
 		return x.IsAvailable
 	}
 	return false
+}
+
+func (x *Task_ResultURL) GetStatusCode() int64 {
+	if x != nil {
+		return x.StatusCode
+	}
+	return 0
 }
 
 type Task_ResultError struct {
@@ -1306,7 +1322,7 @@ const file_api_proxychecker_proxychecker_proto_rawDesc = "" +
 	"\n" +
 	"is_checked\x18\x03 \x01(\bR\tisChecked\x12Y\n" +
 	"\x0ftasks_statistic\x18\x04 \x01(\v20.proxychecker.CheckResultResponse.TasksStatisticR\x0etasksStatistic\x12(\n" +
-	"\x05tasks\x18\x05 \x03(\v2\x12.proxychecker.TaskR\x05tasks\"\xcb\a\n" +
+	"\x05tasks\x18\x05 \x03(\v2\x12.proxychecker.TaskR\x05tasks\"\xfe\a\n" +
 	"\x04Task\x12:\n" +
 	"\fchecker_kind\x18\x01 \x01(\x0e2\x17.proxychecker.CheckKindR\vcheckerKind\x121\n" +
 	"\x06status\x18\x02 \x01(\x0e2\x19.proxychecker.Task.StatusR\x06status\x126\n" +
@@ -1326,9 +1342,12 @@ const file_api_proxychecker_proxychecker_proto_rawDesc = "" +
 	"\x1efrom_host_to_target_round_trip\x18\x02 \x01(\x03R\x19fromHostToTargetRoundTrip\x12C\n" +
 	"\x1ffrom_proxy_to_target_round_trip\x18\x03 \x01(\x03R\x1afromProxyToTargetRoundTrip\x1a\"\n" +
 	"\x10ResultExternalIP\x12\x0e\n" +
-	"\x02ip\x18\x01 \x01(\tR\x02ip\x1a.\n" +
-	"\tResultURL\x12!\n" +
-	"\fis_available\x18\x01 \x01(\bR\visAvailable\x1a'\n" +
+	"\x02ip\x18\x01 \x01(\tR\x02ip\x1aa\n" +
+	"\tResultURL\x12\x10\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x12!\n" +
+	"\fis_available\x18\x02 \x01(\bR\visAvailable\x12\x1f\n" +
+	"\vstatus_code\x18\x03 \x01(\x03R\n" +
+	"statusCode\x1a'\n" +
 	"\vResultError\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"X\n" +
 	"\x06Status\x12\x12\n" +

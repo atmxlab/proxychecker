@@ -73,17 +73,15 @@ type ExternalIPResult struct {
 }
 
 func (r *ExternalIPResult) String() string {
-	return fmt.Sprintf("external IP: [%s]", r.IP)
+	return fmt.Sprintf("external ip: [%s]", r.IP)
 }
 
 type URLResult struct {
 	IsAvailable bool
+	URL         string
+	StatusCode  int
 }
 
 func (r *URLResult) String() string {
-	if r.IsAvailable {
-		return fmt.Sprintf("url is available")
-	}
-
-	return fmt.Sprintf("url is not available")
+	return fmt.Sprintf("url: [%s], is available: [%t], status: [%d]", r.URL, r.IsAvailable, r.StatusCode)
 }

@@ -244,8 +244,15 @@
     "TaskResultURL": {
       "type": "object",
       "properties": {
+        "url": {
+          "type": "string"
+        },
         "isAvailable": {
           "type": "boolean"
+        },
+        "statusCode": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },

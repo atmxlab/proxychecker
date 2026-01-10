@@ -105,9 +105,17 @@ message Task {
   }
 
   message ResultURL {
-    bool is_available = 1;
+    string url = 1;
+    bool is_available = 2;
+    int64 status_code = 3;
   }
 
+  // TODO: checkers
+  //  - https support
+  //  - MITM check
+  //  - privacy
+  //  - headers
+  //  - type (mobile/res/corp)
   message ResultError {
     string message = 1;
   }

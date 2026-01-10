@@ -107,7 +107,9 @@ func mapTask(tk *entity.Task) *desc.Task {
 	if res := tk.State().Result().URLResult; res != nil {
 		pbtk.Result = &desc.Task_Url{
 			Url: &desc.Task_ResultURL{
+				Url:         res.URL,
 				IsAvailable: res.IsAvailable,
+				StatusCode:  int64(res.StatusCode),
 			},
 		}
 	}
