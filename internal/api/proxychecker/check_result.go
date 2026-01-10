@@ -5,6 +5,7 @@ import (
 
 	desc "github.com/atmxlab/proxychecker/gen/proto/api/proxychecker"
 	"github.com/atmxlab/proxychecker/internal/domain/entity"
+	"github.com/atmxlab/proxychecker/internal/domain/vo/proxy"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
 	"github.com/atmxlab/proxychecker/internal/pkg/conv"
 	"github.com/atmxlab/proxychecker/internal/service/query"
@@ -122,5 +123,68 @@ func (s *Service) mapTask(tk *entity.Task) *desc.Task {
 		}
 	}
 
+	if res := tk.State().Result().HTTPSResult; res != nil {
+		pbtk.Result = &desc.Task_Https{
+			Https: &desc.Task_ResultHTTPS{
+				IsAvailable: res.IsAvailable,
+			},
+		}
+	}
+
+	if res := tk.State().Result().MITMResult; res != nil {
+		pbtk.Result = &desc.Task_Mitm{
+			Mitm: &desc.Task_ResultMITM{
+				HasMitm: res.HasMITM,
+			},
+		}
+	}
+
+	if res := tk.State().Result().TypeResult; res != nil {
+		pbtk.Result = &desc.Task_Type{
+			Type: &desc.Task_ResultType{
+				Type: mapProxyType(res.Type),
+			},
+		}
+	}
+
+	if res := tk.State().Result().AnonymousResult; res != nil {
+		pbtk.Result = &desc.Task_Anonymous{
+			Anonymous: &desc.Task_ResultAnonymous{
+				Kind: mapAnonymousKind(res.Kind),
+				SuspiciousHeaders: lo.Map(res.SuspiciousHeaders, func(
+					item task.Header,
+					_ int,
+				) *desc.Task_ResultAnonymous_Header {
+					return &desc.Task_ResultAnonymous_Header{
+						Key:   item.Key,
+						Value: item.Value,
+					}
+				}),
+			},
+		}
+	}
+
 	return pbtk
+}
+
+func mapProxyType(t proxy.Type) desc.Task_ResultType_Type {
+	m := map[proxy.Type]desc.Task_ResultType_Type{
+		proxy.TypeUnknown:     desc.Task_ResultType_UNKNOWN,
+		proxy.TypeDatacenter:  desc.Task_ResultType_DATACENTER,
+		proxy.TypeResidential: desc.Task_ResultType_RESIDENTIAL,
+		proxy.TypeMobile:      desc.Task_ResultType_MOBILE,
+	}
+
+	return m[t]
+}
+
+func mapAnonymousKind(kind proxy.AnonymouseKind) desc.Task_ResultAnonymous_Kind {
+	m := map[proxy.AnonymouseKind]desc.Task_ResultAnonymous_Kind{
+		proxy.AnonymousKindUnknown:     desc.Task_ResultAnonymous_UNKNOWN,
+		proxy.AnonymousKindTransparent: desc.Task_ResultAnonymous_TRANSPARENT,
+		proxy.AnonymousKindMiddle:      desc.Task_ResultAnonymous_MIDDLE,
+		proxy.AnonymousKindHigh:        desc.Task_ResultAnonymous_HIGH,
+	}
+
+	return m[kind]
 }

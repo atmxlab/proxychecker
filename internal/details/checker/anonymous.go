@@ -35,6 +35,10 @@ func (c *AnonymousChecker) Run(ctx context.Context, agg *aggregate.Task) (task.R
 		return task.Result{}, errors.Wrap(err, "httpBin.Get")
 	}
 
+	if output.Origin == "" {
+		return task.Result{}, errors.New("httpbin.Get returned empty result")
+	}
+
 	if output.Origin == c.serverIP {
 		return task.Result{
 			AnonymousResult: &task.AnonymousResult{
@@ -48,13 +52,13 @@ func (c *AnonymousChecker) Run(ctx context.Context, agg *aggregate.Task) (task.R
 		return strings.ToLower(item)
 	})
 
-	suspiciousHeaders := make([]task.Headers, 0)
+	suspiciousHeaders := make([]task.Header, 0)
 
 	for key, value := range output.Headers {
 		if lo.Contains(normalizedSuspiciousHeaderNames, strings.ToLower(key)) ||
 			strings.Contains(value, c.serverIP) ||
 			strings.Contains(key, c.serverIP) {
-			suspiciousHeaders = append(suspiciousHeaders, task.Headers{Key: key, Value: value})
+			suspiciousHeaders = append(suspiciousHeaders, task.Header{Key: key, Value: value})
 		}
 	}
 

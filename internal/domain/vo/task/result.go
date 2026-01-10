@@ -138,14 +138,14 @@ func SuspiciousHeaderNames() []string {
 	}
 }
 
-type Headers struct {
+type Header struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
 
 type AnonymousResult struct {
 	Kind              proxy.AnonymouseKind
-	SuspiciousHeaders []Headers
+	SuspiciousHeaders []Header
 }
 
 func (r *AnonymousResult) String() string {

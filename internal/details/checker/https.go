@@ -21,19 +21,28 @@ func NewHTTPSChecker(clientFactory ClientFactory, httpBinFactory HTTPBinFactory)
 
 func (c *HTTPSChecker) Run(ctx context.Context, agg *aggregate.Task) (task.Result, error) {
 	cl := c.clientFactory.Create(client.WithProxyURL(agg.Proxy().URL()))
-	httpBin := c.httpBinFactory.Create(cl)
 
-	_, err := httpBin.Get(ctx)
+	bytes, err := cl.Get(ctx, "https://google.com")
 	if err != nil {
-		if strings.Contains(err.Error(), "Method not allowed") {
-			return task.Result{
-				HTTPSResult: &task.HTTPSResult{
-					IsAvailable: false,
-				},
-			}, nil
+		for _, msg := range c.connectToProxyErrMessages() {
+			if strings.Contains(err.Error(), msg) {
+				return task.Result{
+					HTTPSResult: &task.HTTPSResult{
+						IsAvailable: false,
+					},
+				}, nil
+			}
 		}
-		
+
 		return task.Result{}, errors.Wrap(err, "httpBin.Get")
+	}
+
+	if strings.Contains(string(bytes), "itemscope") {
+		return task.Result{
+			HTTPSResult: &task.HTTPSResult{
+				IsAvailable: false,
+			},
+		}, nil
 	}
 
 	return task.Result{
@@ -41,4 +50,14 @@ func (c *HTTPSChecker) Run(ctx context.Context, agg *aggregate.Task) (task.Resul
 			IsAvailable: true,
 		},
 	}, nil
+}
+
+func (c *HTTPSChecker) connectToProxyErrMessages() []string {
+	return []string{
+		"Method not allowed",
+		"Bad Request",
+		"Bad Gateway",
+		"Service Unavailable",
+		"Internal Server Error",
+	}
 }

@@ -13,6 +13,10 @@ func FromCheckerKind(kind checker.Kind) desc.CheckKind {
 		checker.KindLatency:    desc.CheckKind_CHECK_KIND_LATENCY,
 		checker.KindExternalIP: desc.CheckKind_CHECK_KIND_EXTERNAL_IP,
 		checker.KindURL:        desc.CheckKind_CHECK_KIND_URL,
+		checker.KindHTTPS:      desc.CheckKind_CHECK_KIND_HTTPS,
+		checker.KindMITM:       desc.CheckKind_CHECK_KIND_MITM,
+		checker.KindType:       desc.CheckKind_CHECK_KIND_TYPE,
+		checker.KindAnonymous:  desc.CheckKind_CHECK_KIND_ANONYMOUS,
 	}
 
 	return m[kind]

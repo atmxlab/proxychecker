@@ -82,22 +82,8 @@
     }
   },
   "definitions": {
-    "CheckRequestKind": {
-      "type": "object",
-      "properties": {
-        "geo": {
-          "$ref": "#/definitions/KindGeo"
-        },
-        "latency": {
-          "$ref": "#/definitions/KindLatency"
-        },
-        "url": {
-          "$ref": "#/definitions/KindUrl"
-        },
-        "externalIp": {
-          "$ref": "#/definitions/KindExternalIp"
-        }
-      }
+    "CheckRequestKindType": {
+      "type": "object"
     },
     "CheckResultResponseProxiesStatistic": {
       "type": "object",
@@ -174,13 +160,22 @@
         }
       }
     },
+    "KindAnonymous": {
+      "type": "object"
+    },
     "KindExternalIp": {
       "type": "object"
     },
     "KindGeo": {
       "type": "object"
     },
+    "KindHttps": {
+      "type": "object"
+    },
     "KindLatency": {
+      "type": "object"
+    },
+    "KindMitm": {
       "type": "object"
     },
     "KindUrl": {
@@ -190,6 +185,42 @@
           "type": "string"
         }
       }
+    },
+    "ResultAnonymousHeader": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskResultAnonymous": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/TaskResultAnonymousKind"
+        },
+        "suspiciousHeaders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ResultAnonymousHeader"
+          }
+        }
+      }
+    },
+    "TaskResultAnonymousKind": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "TRANSPARENT",
+        "MIDDLE",
+        "HIGH"
+      ],
+      "default": "UNKNOWN"
     },
     "TaskResultError": {
       "type": "object",
@@ -224,6 +255,14 @@
         }
       }
     },
+    "TaskResultHTTPS": {
+      "type": "object",
+      "properties": {
+        "isAvailable": {
+          "type": "boolean"
+        }
+      }
+    },
     "TaskResultLatency": {
       "type": "object",
       "properties": {
@@ -240,6 +279,32 @@
           "format": "int64"
         }
       }
+    },
+    "TaskResultMITM": {
+      "type": "object",
+      "properties": {
+        "hasMitm": {
+          "type": "boolean"
+        }
+      }
+    },
+    "TaskResultType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/TaskResultTypeType"
+        }
+      }
+    },
+    "TaskResultTypeType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "DATACENTER",
+        "RESIDENTIAL",
+        "MOBILE"
+      ],
+      "default": "UNKNOWN"
     },
     "TaskResultURL": {
       "type": "object",
@@ -291,7 +356,11 @@
         "CHECK_KIND_GEO",
         "CHECK_KIND_LATENCY",
         "CHECK_KIND_URL",
-        "CHECK_KIND_EXTERNAL_IP"
+        "CHECK_KIND_EXTERNAL_IP",
+        "CHECK_KIND_HTTPS",
+        "CHECK_KIND_MITM",
+        "CHECK_KIND_TYPE",
+        "CHECK_KIND_ANONYMOUS"
       ],
       "default": "CHECK_KIND_UNKNOWN"
     },
@@ -302,7 +371,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/CheckRequestKind"
+            "$ref": "#/definitions/proxycheckerCheckRequestKind"
           }
         },
         "proxies": {
@@ -310,6 +379,35 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "proxycheckerCheckRequestKind": {
+      "type": "object",
+      "properties": {
+        "geo": {
+          "$ref": "#/definitions/KindGeo"
+        },
+        "latency": {
+          "$ref": "#/definitions/KindLatency"
+        },
+        "url": {
+          "$ref": "#/definitions/KindUrl"
+        },
+        "externalIp": {
+          "$ref": "#/definitions/KindExternalIp"
+        },
+        "https": {
+          "$ref": "#/definitions/KindHttps"
+        },
+        "mitm": {
+          "$ref": "#/definitions/KindMitm"
+        },
+        "type": {
+          "$ref": "#/definitions/CheckRequestKindType"
+        },
+        "anonymous": {
+          "$ref": "#/definitions/KindAnonymous"
         }
       }
     },
@@ -370,6 +468,18 @@
         },
         "url": {
           "$ref": "#/definitions/TaskResultURL"
+        },
+        "https": {
+          "$ref": "#/definitions/TaskResultHTTPS"
+        },
+        "mitm": {
+          "$ref": "#/definitions/TaskResultMITM"
+        },
+        "type": {
+          "$ref": "#/definitions/TaskResultType"
+        },
+        "anonymous": {
+          "$ref": "#/definitions/TaskResultAnonymous"
         }
       }
     },

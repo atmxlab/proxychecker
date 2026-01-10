@@ -14,6 +14,10 @@ enum CheckKind {
   CHECK_KIND_LATENCY = 2;
   CHECK_KIND_URL = 3;
   CHECK_KIND_EXTERNAL_IP = 4;
+  CHECK_KIND_HTTPS = 5;
+  CHECK_KIND_MITM = 6;
+  CHECK_KIND_TYPE = 7;
+  CHECK_KIND_ANONYMOUS = 8;
 }
 
 message CheckRequest {
@@ -24,12 +28,20 @@ message CheckRequest {
       string url = 1;
     }
     message ExternalIp {}
+    message Https {}
+    message Mitm {}
+    message Type {}
+    message Anonymous {}
 
     oneof kind {
       Geo geo = 1;
       Latency latency = 2;
       Url url = 3;
       ExternalIp external_ip = 4;
+      Https https = 5;
+      Mitm mitm = 6;
+      Type type = 7;
+      Anonymous anonymous = 8;
     }
   }
 
@@ -94,6 +106,10 @@ message Task {
     string timezone = 4;
   }
 
+  message ResultError {
+    string message = 1;
+  }
+
   message ResultLatency {
     int64 from_host_to_proxy_round_trip = 1;
     int64 from_host_to_target_round_trip = 2;
@@ -110,8 +126,40 @@ message Task {
     int64 status_code = 3;
   }
 
-  message ResultError {
-    string message = 1;
+  message ResultHTTPS {
+    bool is_available = 1;
+  }
+
+  message ResultMITM {
+    bool has_mitm = 1;
+  }
+
+  message ResultType {
+    enum Type {
+      UNKNOWN = 0;
+      DATACENTER = 1;
+      RESIDENTIAL = 2;
+      MOBILE = 3;
+    }
+
+    Type type = 1;
+  }
+
+  message ResultAnonymous {
+    enum Kind {
+      UNKNOWN = 0;
+      TRANSPARENT = 1;
+      MIDDLE = 2;
+      HIGH = 3;
+    }
+
+    message Header {
+      string key = 1;
+      string value = 2;
+    }
+
+    Kind kind = 1;
+    repeated Header suspicious_headers = 2;
   }
 
   CheckKind checker_kind = 1;
@@ -122,5 +170,9 @@ message Task {
     ResultLatency latency = 5;
     ResultExternalIP external_ip = 6;
     ResultURL url = 7;
+    ResultHTTPS https = 8;
+    ResultMITM mitm = 9;
+    ResultType type = 10;
+    ResultAnonymous anonymous = 11;
   }
 }

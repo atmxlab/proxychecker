@@ -26,6 +26,14 @@ func (s *Service) Check(ctx context.Context, req *desc.CheckRequest) (*desc.Chec
 					return checker.KindURL
 				case *desc.CheckRequest_Kind_ExternalIp_:
 					return checker.KindExternalIP
+				case *desc.CheckRequest_Kind_Https_:
+					return checker.KindHTTPS
+				case *desc.CheckRequest_Kind_Mitm_:
+					return checker.KindMITM
+				case *desc.CheckRequest_Kind_Type_:
+					return checker.KindType
+				case *desc.CheckRequest_Kind_Anonymous_:
+					return checker.KindAnonymous
 				default:
 					return checker.KindUnknown
 				}
