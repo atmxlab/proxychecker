@@ -96,6 +96,11 @@ func SetupContainerBuilder(cfg Config) *ContainerBuilder {
 				Type(checker.NewTypeChecker(
 					cb.Container().Entities().ClientFactory(),
 					cb.Container().Entities().IpApiFactory(),
+				)).
+				Anonymous(checker.NewAnonymousChecker(
+					cb.Container().Config().Env.ServerIP,
+					cb.Container().Entities().ClientFactory(),
+					cb.Container().Entities().HttpBinFactory(),
 				))
 		}).
 		WithCommands(func(pb *CommandsBuilder) {

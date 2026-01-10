@@ -12,6 +12,7 @@ type Checkers struct {
 	https      handler.Checker
 	mitm       handler.Checker
 	proxyType  handler.Checker
+	anonymous  handler.Checker
 }
 
 func (c Checkers) GEO() handler.Checker {
@@ -40,6 +41,10 @@ func (c Checkers) MITM() handler.Checker {
 
 func (c Checkers) Type() handler.Checker {
 	return c.proxyType
+}
+
+func (c Checkers) Anonymous() handler.Checker {
+	return c.anonymous
 }
 
 type CheckersBuilder struct {
@@ -86,5 +91,10 @@ func (cb *CheckersBuilder) MITM(mitm handler.Checker) *CheckersBuilder {
 
 func (cb *CheckersBuilder) Type(proxyType handler.Checker) *CheckersBuilder {
 	cb.c.checkers.proxyType = proxyType
+	return cb
+}
+
+func (cb *CheckersBuilder) Anonymous(a handler.Checker) *CheckersBuilder {
+	cb.c.checkers.anonymous = a
 	return cb
 }

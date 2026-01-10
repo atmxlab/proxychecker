@@ -4,6 +4,7 @@ type Config struct {
 	Queue  Queue  `atmc:"queue"`
 	API    API    `atmc:"api"`
 	Logger Logger `atmc:"logger"`
+	Env    Env    `atmc:"env"`
 }
 
 type Logger struct {
@@ -40,4 +41,8 @@ type SwaggerUI struct {
 type SwaggerJSON struct {
 	URL  string `atmc:"url"`
 	Path string `atmc:"path"`
+}
+
+type Env struct {
+	ServerIP string `atmc:"serverIP"`
 }

@@ -16,6 +16,7 @@ type Result struct {
 	HTTPSResult      *HTTPSResult      `json:"httpsResult,omitempty"`
 	MITMResult       *MITMResult       `json:"hasMITM,omitempty"`
 	TypeResult       *TypeResult       `json:"typeResult,omitempty"`
+	AnonymousResult  *AnonymousResult  `json:"anonymousResult,omitempty"`
 }
 
 func (r Result) String() string {
@@ -42,6 +43,9 @@ func (r Result) String() string {
 	}
 	if r.TypeResult != nil {
 		return r.TypeResult.String()
+	}
+	if r.AnonymousResult != nil {
+		return r.AnonymousResult.String()
 	}
 
 	return ""
@@ -122,4 +126,28 @@ type TypeResult struct {
 
 func (r *TypeResult) String() string {
 	return fmt.Sprintf("type: [%s]", r.Type)
+}
+
+func SuspiciousHeaderNames() []string {
+	return []string{
+		"Via",
+		"X-Forwarded-For",
+		"X-Real-IP",
+		"Forwarded",
+		"Client-IP",
+	}
+}
+
+type Headers struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type AnonymousResult struct {
+	Kind              proxy.AnonymouseKind
+	SuspiciousHeaders []Headers
+}
+
+func (r *AnonymousResult) String() string {
+	return fmt.Sprintf("kind: [%s], suspicious headers: [%v]", r.Kind, r.SuspiciousHeaders)
 }

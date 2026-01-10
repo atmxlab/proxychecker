@@ -65,3 +65,12 @@ const (
 	TypeResidential Type = "residential"
 	TypeMobile      Type = "mobile"
 )
+
+type AnonymouseKind string
+
+const (
+	AnonymousKindUnknown     AnonymouseKind = "unknown"
+	AnonymousKindTransparent AnonymouseKind = "transparent"
+	AnonymousKindMiddle      AnonymouseKind = "middle"
+	AnonymousKindHigh        AnonymouseKind = "high"
+)
