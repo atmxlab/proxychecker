@@ -20,7 +20,8 @@ func SetupContainerBuilder(cfg Config) *ContainerBuilder {
 				TimeProvider(time.NewNowProvider()).
 				Queue(queue.NewQueue(queuerepo.New(), cfg.Queue.QueueBufferSize)).
 				ClientFactory(factory.NewClientFactory()).
-				IpAPIFactory(factory.NewIPApiFactory())
+				IpAPIFactory(factory.NewIPApiFactory()).
+				HTTPBinFactory(factory.NewHTTPBinFactory())
 		}).
 		WithPorts(func(pb *PortsBuilder) {
 			pb.RunTx(inmemory.NewRunTx())
@@ -83,6 +84,18 @@ func SetupContainerBuilder(cfg Config) *ContainerBuilder {
 				)).
 				URL(checker.NewURLChecker(
 					cb.Container().Entities().ClientFactory(),
+				)).
+				HTTPS(checker.NewHTTPSChecker(
+					cb.Container().Entities().ClientFactory(),
+					cb.Container().Entities().HttpBinFactory(),
+				)).
+				MITM(checker.NewMITMChecker(
+					cb.Container().Entities().ClientFactory(),
+					cb.Container().Entities().HttpBinFactory(),
+				)).
+				Type(checker.NewTypeChecker(
+					cb.Container().Entities().ClientFactory(),
+					cb.Container().Entities().IpApiFactory(),
 				))
 		}).
 		WithCommands(func(pb *CommandsBuilder) {

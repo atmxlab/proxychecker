@@ -23,4 +23,7 @@ func (a *App) initQueue() {
 	addHandler(stask.KindCheckGEO, a.Container().Checkers().GEO())
 	addHandler(stask.KindCheckExternalIP, a.Container().Checkers().ExternalIP())
 	addHandler(stask.KindCheckURL, a.Container().Checkers().URL())
+	addHandler(stask.KindCheckURL, a.Container().Checkers().HTTPS())
+	addHandler(stask.KindCheckURL, a.Container().Checkers().MITM())
+	addHandler(stask.KindCheckURL, a.Container().Checkers().Type())
 }

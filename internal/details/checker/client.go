@@ -31,5 +31,5 @@ type HTTPBin interface {
 
 //go:generate mock IPApiFactory
 type HTTPBinFactory interface {
-	Create(client Client) IPApi
+	Create(client Client) HTTPBin
 }

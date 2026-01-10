@@ -76,3 +76,23 @@ func TestCheck(t *testing.T) {
 		return item.URL()
 	}))
 }
+
+func TestCheckInput(t *testing.T) {
+	t.Parallel()
+
+	t.Run("proxies_without_protocol", func(t *testing.T) {
+		t.Parallel()
+
+		i := command.CheckInput{
+			OperationTime: time.Now(),
+			Proxies: []string{
+				"44.195.46.162:80",
+			},
+			Checkers: []checker.KindWithPayload{
+				checker.NewKindWithPayload(task.NewEmptyPayload(), checker.KindGEO),
+			},
+		}
+
+		require.Error(t, i.Validate())
+	})
+}

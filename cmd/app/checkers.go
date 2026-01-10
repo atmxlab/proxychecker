@@ -9,6 +9,9 @@ type Checkers struct {
 	latency    handler.Checker
 	externalIP handler.Checker
 	url        handler.Checker
+	https      handler.Checker
+	mitm       handler.Checker
+	proxyType  handler.Checker
 }
 
 func (c Checkers) GEO() handler.Checker {
@@ -25,6 +28,18 @@ func (c Checkers) ExternalIP() handler.Checker {
 
 func (c Checkers) URL() handler.Checker {
 	return c.url
+}
+
+func (c Checkers) HTTPS() handler.Checker {
+	return c.https
+}
+
+func (c Checkers) MITM() handler.Checker {
+	return c.mitm
+}
+
+func (c Checkers) Type() handler.Checker {
+	return c.proxyType
 }
 
 type CheckersBuilder struct {
@@ -56,5 +71,20 @@ func (cb *CheckersBuilder) ExternalIP(e handler.Checker) *CheckersBuilder {
 
 func (cb *CheckersBuilder) URL(url handler.Checker) *CheckersBuilder {
 	cb.c.checkers.url = url
+	return cb
+}
+
+func (cb *CheckersBuilder) HTTPS(https handler.Checker) *CheckersBuilder {
+	cb.c.checkers.https = https
+	return cb
+}
+
+func (cb *CheckersBuilder) MITM(mitm handler.Checker) *CheckersBuilder {
+	cb.c.checkers.mitm = mitm
+	return cb
+}
+
+func (cb *CheckersBuilder) Type(proxyType handler.Checker) *CheckersBuilder {
+	cb.c.checkers.proxyType = proxyType
 	return cb
 }

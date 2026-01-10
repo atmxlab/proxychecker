@@ -3,6 +3,8 @@ package task
 import (
 	"fmt"
 	"time"
+
+	"github.com/atmxlab/proxychecker/internal/domain/vo/proxy"
 )
 
 type Result struct {
@@ -11,6 +13,9 @@ type Result struct {
 	GEOResult        *GEOResult        `json:"geoResult,omitempty"`
 	ExternalIPResult *ExternalIPResult `json:"externalIPResult,omitempty"`
 	URLResult        *URLResult        `json:"urlResult,omitempty"`
+	HTTPSResult      *HTTPSResult      `json:"httpsResult,omitempty"`
+	MITMResult       *MITMResult       `json:"hasMITM,omitempty"`
+	TypeResult       *TypeResult       `json:"typeResult,omitempty"`
 }
 
 func (r Result) String() string {
@@ -28,6 +33,15 @@ func (r Result) String() string {
 	}
 	if r.URLResult != nil {
 		return r.URLResult.String()
+	}
+	if r.HTTPSResult != nil {
+		return r.HTTPSResult.String()
+	}
+	if r.MITMResult != nil {
+		return r.MITMResult.String()
+	}
+	if r.TypeResult != nil {
+		return r.TypeResult.String()
 	}
 
 	return ""
@@ -84,4 +98,28 @@ type URLResult struct {
 
 func (r *URLResult) String() string {
 	return fmt.Sprintf("url: [%s], is available: [%t], status: [%d]", r.URL, r.IsAvailable, r.StatusCode)
+}
+
+type HTTPSResult struct {
+	IsAvailable bool `json:"isAvailable"`
+}
+
+func (r *HTTPSResult) String() string {
+	return fmt.Sprintf("isAvailable: [%t]", r.IsAvailable)
+}
+
+type MITMResult struct {
+	HasMITM bool `json:"hasMITM"`
+}
+
+func (r *MITMResult) String() string {
+	return fmt.Sprintf("hasMIT: [%t]", r.HasMITM)
+}
+
+type TypeResult struct {
+	Type proxy.Type
+}
+
+func (r *TypeResult) String() string {
+	return fmt.Sprintf("type: [%s]", r.Type)
 }

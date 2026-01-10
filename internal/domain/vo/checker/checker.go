@@ -13,6 +13,9 @@ const (
 	KindGEO        Kind = "geo"
 	KindExternalIP Kind = "externalIP"
 	KindURL        Kind = "url"
+	KindHTTPS      Kind = "https"
+	KindMITM       Kind = "mitm"
+	KindType       Kind = "type"
 )
 
 func KindFromString(kind string) Kind {
@@ -22,6 +25,9 @@ func KindFromString(kind string) Kind {
 		"geo":        KindGEO,
 		"externalIP": KindExternalIP,
 		"url":        KindURL,
+		"https":      KindHTTPS,
+		"mitm":       KindMITM,
+		"type":       KindType,
 	}
 
 	if k, ok := m[kind]; ok {

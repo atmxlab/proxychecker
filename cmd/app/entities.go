@@ -7,10 +7,11 @@ import (
 )
 
 type Entities struct {
-	timeProvider  time.Provider
-	clientFactory *factory.ClientFactory
-	ipApiFactory  *factory.IPApiFactory
-	queue         *queue.Queue
+	timeProvider   time.Provider
+	clientFactory  *factory.ClientFactory
+	ipApiFactory   *factory.IPApiFactory
+	httpBinFactory *factory.HTTPBinFactory
+	queue          *queue.Queue
 }
 
 func (e Entities) TimeProvider() time.Provider {
@@ -23,6 +24,10 @@ func (e Entities) ClientFactory() *factory.ClientFactory {
 
 func (e Entities) IpApiFactory() *factory.IPApiFactory {
 	return e.ipApiFactory
+}
+
+func (e Entities) HttpBinFactory() *factory.HTTPBinFactory {
+	return e.httpBinFactory
 }
 
 func (e Entities) Queue() *queue.Queue {
@@ -53,6 +58,11 @@ func (eb *EntitiesBuilder) ClientFactory(f *factory.ClientFactory) *EntitiesBuil
 
 func (eb *EntitiesBuilder) IpAPIFactory(f *factory.IPApiFactory) *EntitiesBuilder {
 	eb.c.entities.ipApiFactory = f
+	return eb
+}
+
+func (eb *EntitiesBuilder) HTTPBinFactory(f *factory.HTTPBinFactory) *EntitiesBuilder {
+	eb.c.entities.httpBinFactory = f
 	return eb
 }
 

@@ -20,6 +20,9 @@ const (
 	KindCheckGEO        Kind = "CheckGEO"
 	KindCheckExternalIP Kind = "CheckExternalIP"
 	KindCheckURL        Kind = "CheckURL"
+	KindCheckHTTPS      Kind = "CheckHTTPS"
+	KindCheckMITM       Kind = "CheckMITM"
+	KindCheckType       Kind = "CheckType"
 )
 
 func (t Kind) String() string {
@@ -37,6 +40,9 @@ func FromDomainTask(kind checker.Kind) Kind {
 		checker.KindGEO:        KindCheckGEO,
 		checker.KindExternalIP: KindCheckExternalIP,
 		checker.KindURL:        KindCheckURL,
+		checker.KindHTTPS:      KindCheckHTTPS,
+		checker.KindMITM:       KindCheckMITM,
+		checker.KindType:       KindCheckType,
 	}
 
 	return m[kind]

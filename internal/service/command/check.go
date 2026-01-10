@@ -29,8 +29,15 @@ func (i CheckInput) Validate() error {
 	if len(i.Proxies) == 0 {
 		v.Failed("empty proxies")
 	}
+	if len(i.Proxies) > 1000 {
+		v.Failed("too many proxies")
+	}
+
 	if len(i.Checkers) == 0 {
 		v.Failed("empty checkers")
+	}
+	if len(i.Checkers) > 100 {
+		v.Failed("too many checkers")
 	}
 
 	for _, ch := range i.Checkers {
@@ -45,10 +52,10 @@ func (i CheckInput) Validate() error {
 		u, err := url.Parse(pUrl)
 		if err != nil {
 			v.AddErr(errors.Wrapf(err, "invalid proxy URL: %s", pUrl))
-		}
-
-		if _, ok := proxy.TryProtocolFromString(u.Scheme); !ok {
-			v.Failed(fmt.Sprintf("invalid proxy protocol: %s", u.Scheme))
+		} else {
+			if _, ok := proxy.TryProtocolFromString(u.Scheme); !ok {
+				v.Failed(fmt.Sprintf("invalid proxy protocol: %s", u.Scheme))
+			}
 		}
 	}
 

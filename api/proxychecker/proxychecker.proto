@@ -110,12 +110,6 @@ message Task {
     int64 status_code = 3;
   }
 
-  // TODO: checkers
-  //  - https support
-  //  - MITM check
-  //  - privacy
-  //  - headers
-  //  - type (mobile/res/corp)
   message ResultError {
     string message = 1;
   }

@@ -56,3 +56,12 @@ func TryProtocolFromString(s string) (Protocol, bool) {
 
 	return "", false
 }
+
+type Type string
+
+const (
+	TypeUnknown     Type = "unknown"
+	TypeDatacenter  Type = "datacenter"
+	TypeResidential Type = "residential"
+	TypeMobile      Type = "mobile"
+)
