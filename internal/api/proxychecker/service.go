@@ -15,3 +15,11 @@ func New(c *app.Container) *Service {
 		c: c,
 	}
 }
+
+func (s *Service) IsProd() bool {
+	return s.env() == "prod"
+}
+
+func (s *Service) env() string {
+	return s.c.Config().Env.ENV
+}

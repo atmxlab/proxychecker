@@ -16,6 +16,7 @@ const (
 	KindHTTPS      Kind = "https"
 	KindMITM       Kind = "mitm"
 	KindType       Kind = "type"
+	KindAnonymous  Kind = "anonymous"
 )
 
 func KindFromString(kind string) Kind {
@@ -28,6 +29,7 @@ func KindFromString(kind string) Kind {
 		"https":      KindHTTPS,
 		"mitm":       KindMITM,
 		"type":       KindType,
+		"anonymous":  KindAnonymous,
 	}
 
 	if k, ok := m[kind]; ok {

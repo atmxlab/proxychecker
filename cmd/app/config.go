@@ -45,4 +45,5 @@ type SwaggerJSON struct {
 
 type Env struct {
 	ServerIP string `atmc:"serverIP"`
+	ENV      string `atmc:"env"`
 }

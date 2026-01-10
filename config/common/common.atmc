@@ -5,6 +5,7 @@ logger ./logger.atmc
     queue: queue
     logger: logger
     env: {
+        env: $ENV
         serverIP: $SERVER_IP
     }
 }

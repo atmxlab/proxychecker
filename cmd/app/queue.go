@@ -23,7 +23,8 @@ func (a *App) initQueue() {
 	addHandler(stask.KindCheckGEO, a.Container().Checkers().GEO())
 	addHandler(stask.KindCheckExternalIP, a.Container().Checkers().ExternalIP())
 	addHandler(stask.KindCheckURL, a.Container().Checkers().URL())
-	addHandler(stask.KindCheckURL, a.Container().Checkers().HTTPS())
-	addHandler(stask.KindCheckURL, a.Container().Checkers().MITM())
-	addHandler(stask.KindCheckURL, a.Container().Checkers().Type())
+	addHandler(stask.KindCheckHTTPS, a.Container().Checkers().HTTPS())
+	addHandler(stask.KindCheckMITM, a.Container().Checkers().MITM())
+	addHandler(stask.KindCheckType, a.Container().Checkers().Type())
+	addHandler(stask.KindCheckAnonymouse, a.Container().Checkers().Anonymous())
 }

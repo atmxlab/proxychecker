@@ -23,6 +23,7 @@ const (
 	KindCheckHTTPS      Kind = "CheckHTTPS"
 	KindCheckMITM       Kind = "CheckMITM"
 	KindCheckType       Kind = "CheckType"
+	KindCheckAnonymouse Kind = "CheckAnonymouse"
 )
 
 func (t Kind) String() string {
@@ -43,6 +44,7 @@ func FromDomainTask(kind checker.Kind) Kind {
 		checker.KindHTTPS:      KindCheckHTTPS,
 		checker.KindMITM:       KindCheckMITM,
 		checker.KindType:       KindCheckType,
+		checker.KindAnonymous:  KindCheckAnonymouse,
 	}
 
 	return m[kind]

@@ -38,13 +38,13 @@ func (s *Service) CheckResult(ctx context.Context, req *desc.CheckResultRequest)
 			item query.CheckResultOutputProxyInfo,
 			_ int,
 		) *desc.CheckResultResponse_Proxy {
-			return mapProxiesResult(item)
+			return s.mapProxiesResult(item)
 		}),
 		IsChecked: res.IsChecked,
 	}, nil
 }
 
-func mapProxiesResult(pxInfo query.CheckResultOutputProxyInfo) *desc.CheckResultResponse_Proxy {
+func (s *Service) mapProxiesResult(pxInfo query.CheckResultOutputProxyInfo) *desc.CheckResultResponse_Proxy {
 	return &desc.CheckResultResponse_Proxy{
 		Id:        pxInfo.Proxy.ID().String(),
 		Url:       pxInfo.Proxy.URL(),
@@ -56,21 +56,29 @@ func mapProxiesResult(pxInfo query.CheckResultOutputProxyInfo) *desc.CheckResult
 			PendingCount: int64(pxInfo.TasksStatistic.PendingCount),
 		},
 		Tasks: lo.Map(pxInfo.Tasks, func(item *entity.Task, _ int) *desc.Task {
-			return mapTask(item)
+			return s.mapTask(item)
 		}),
 	}
 }
 
-func mapTask(tk *entity.Task) *desc.Task {
+func (s *Service) mapTask(tk *entity.Task) *desc.Task {
 	pbtk := &desc.Task{
 		CheckerKind: conv.FromCheckerKind(tk.CheckerKind()),
 		Status:      conv.FromTaskStatus(tk.Status()),
 	}
 
-	if e := tk.State().Result().ErrorResult; e != nil {
+	if e := tk.State().Result().ErrorResult; e != nil && s.IsProd() {
 		pbtk.Result = &desc.Task_Error{
 			Error: &desc.Task_ResultError{
-				Message: e.Message,
+				Message: e.Code.String(),
+			},
+		}
+	}
+
+	if e := tk.State().Result().ErrorResult; e != nil && !s.IsProd() {
+		pbtk.Result = &desc.Task_Error{
+			Error: &desc.Task_ResultError{
+				Message: e.String(),
 			},
 		}
 	}

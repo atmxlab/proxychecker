@@ -2,6 +2,10 @@ package handler
 
 import (
 	"context"
+	"crypto/x509"
+	"net"
+	"net/url"
+	"strings"
 
 	"github.com/atmxlab/proxychecker/internal/domain/aggregate"
 	"github.com/atmxlab/proxychecker/internal/domain/vo/task"
@@ -48,9 +52,8 @@ func (c *BaseCheckHandler) Handle(ctx context.Context, qt queue.Task) error {
 	res, err := c.checker.Run(ctx, t)
 	if err != nil {
 		if failureErr := t.Failure(task.Result{
-			// TODO: тут нужно понять, какую ошибку возвращает и правильный код присваивать
 			ErrorResult: &task.ErrorResult{
-				Code:    task.ErrCodeUnknown,
+				Code:    c.detectErrorCode(err),
 				Message: err.Error(),
 			},
 		}); failureErr != nil {
@@ -68,4 +71,61 @@ func (c *BaseCheckHandler) Handle(ctx context.Context, qt queue.Task) error {
 	}
 
 	return nil
+}
+
+func (c *BaseCheckHandler) detectErrorCode(err error) task.ErrCode {
+	var urlErr *url.Error
+	if errors.As(err, &urlErr) {
+		switch e := urlErr.Err.(type) {
+		case *net.OpError:
+			if e.Op == "dial" {
+				if strings.Contains(e.Err.Error(), "refused") {
+					return task.ErrCodeConnectionRefused
+				}
+				if strings.Contains(e.Err.Error(), "i/o timeout") {
+					return task.ErrCodeConnectionTimeout
+				}
+				return task.ErrCodeNetwork
+			}
+			return task.ErrCodeNetwork
+		case net.Error:
+			if e.Timeout() {
+				return task.ErrCodeTimeout
+			}
+			return task.ErrCodeNetwork
+
+		case *x509.UnknownAuthorityError:
+			return task.ErrCodeTLSCertUnknownAuthority
+
+		case *x509.HostnameError:
+			return task.ErrCodeTLSCertHostnameMismatch
+
+		case *x509.CertificateInvalidError:
+			return task.ErrCodeTLSCertInvalid
+
+		default:
+			msg := e.Error()
+			if strings.Contains(msg, "EOF") {
+				return task.ErrCodeConnectionClosedUnexpectedly
+			}
+			if strings.Contains(msg, "timeout") {
+				return task.ErrCodeTimeout
+			}
+			if strings.Contains(msg, "header") {
+				return task.ErrCodeHeaderReadTimeout
+			}
+
+			return task.ErrCodeUnknown
+		}
+	}
+
+	msg := err.Error()
+	if strings.Contains(msg, "proxyconnect") {
+		return task.ErrCodeProxyConnectionFailed
+	}
+	if strings.Contains(msg, "certificate") {
+		return task.ErrCodeTLSCertInvalid
+	}
+
+	return task.ErrCodeUnknown
 }
