@@ -1,3 +1,8 @@
+# ********* ENV *********
+SERVER_IP=127.0.0.1
+ENV=local
+export
+
 API_CMD_PATH=./cmd/api
 CONSOLE_CMD_PATH=./cmd/console
 
@@ -39,3 +44,8 @@ proto\:gen:
 
 proto\:clean:
 	rm -rf gen/proto
+
+force-push:
+	git add .
+	git commit --amend --no-edit
+	git push -f

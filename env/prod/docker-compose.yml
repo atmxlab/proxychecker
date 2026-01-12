@@ -1,0 +1,10 @@
+services:
+  api:
+    image: supermetrolog/checker:${APP_VERSION}
+    container_name: api
+    environment:
+      SERVER_IP: ${SERVER_IP}
+      ENV: ${ENV}
+    restart: unless-stopped
+    ports:
+      - "8080:8080"

@@ -12,7 +12,6 @@ import (
 	"github.com/atmxlab/proxychecker/internal/api/proxychecker"
 	"github.com/atmxlab/proxychecker/internal/pkg/config"
 	_ "github.com/atmxlab/proxychecker/pkg/logger"
-	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,13 +19,12 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	err := godotenv.Load(".env")
+	appCfg, err := config.LoadAndScan[app.Config]("config/api/api.atmc")
 	if err != nil {
 		panic(err)
 	}
 
-	appCfg, err := config.LoadAndScan[app.Config]("config/api/api.atmc")
-	if err != nil {
+	if err = appCfg.Validate(); err != nil {
 		panic(err)
 	}
 
