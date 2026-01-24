@@ -1,4 +1,4 @@
 {
-    queueWorkerCount: 20
+    queueWorkerCount: 100
     queueBufferSize: 100
 }

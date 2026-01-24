@@ -34,10 +34,10 @@ func (c *HTTPSChecker) Run(ctx context.Context, agg *aggregate.Task) (task.Resul
 			}
 		}
 
-		return task.Result{}, errors.Wrap(err, "httpBin.Get")
+		return task.Result{}, errors.Wrap(err, "client.Get")
 	}
 
-	if strings.Contains(string(bytes), "itemscope") {
+	if !strings.Contains(string(bytes), "itemscope") {
 		return task.Result{
 			HTTPSResult: &task.HTTPSResult{
 				IsAvailable: false,

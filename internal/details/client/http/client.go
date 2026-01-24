@@ -54,7 +54,7 @@ func NewClient(cfg client.Config) *Client {
 				return nil
 			},
 			Jar:     nil,
-			Timeout: 3 * time.Second,
+			Timeout: 10 * time.Second,
 		},
 	}
 }
